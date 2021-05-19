@@ -24,6 +24,9 @@ class TravelTimeMetric(BaseMetric):
             if done or not vehicle in vehicles:
                 self.travel_times.append(current_time - self.vehicle_enter_time[vehicle])
                 del self.vehicle_enter_time[vehicle]
+
+        if done:
+            print("eveluated vehicles:", len(self.travel_times))
+            
         
         return np.mean(self.travel_times) if len(self.travel_times) else 0
-        
