@@ -185,6 +185,6 @@ if __name__ == '__main__':
     # simulate
     # import os
     # os.environ["CUDA_VISIBLE_DEVICES"] = '0, 1'
-    # train(args, env)
-    test()
+    train(args, env)
+    #test()
     # meta_test('/mnt/d/Cityflow/examples/config.json')

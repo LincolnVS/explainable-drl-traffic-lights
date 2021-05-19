@@ -181,11 +181,13 @@ class World(object):
             "lane_vehicles": self.eng.get_lane_vehicles,
             "time": self.eng.get_current_time,
             "vehicle_distance": self.eng.get_vehicle_distance,
-            "pressure": self.get_pressure,
+            "pressure": self.get_pressure_waiting,
             "lane_waiting_time_count": self.get_lane_waiting_time_count,
             "lane_delay": self.get_lane_delay,
             "vehicle_trajectory": self.get_vehicle_trajectory,
-            "history_vehicles": self.get_history_vehicles
+            "history_vehicles": self.get_history_vehicles,
+            "car_count": self.get_car_count,
+            "state_of_three": self.get_state_of_three
         }
         self.fns = []
         self.info = {}
@@ -195,6 +197,31 @@ class World(object):
         self.history_vehicles = set()
 
         print("world built.")
+
+    def get_pressure_waiting(self):
+        vehicles = self.eng.get_lane_vehicle_count()
+        pressures = {}
+        for i in self.intersections:
+            pressure = 0
+            in_lanes = []
+            for road in i.in_roads:
+                from_zero = (road["startIntersection"] == i.id) if self.RIGHT else (
+                        road["endIntersection"] == i.id)
+                for n in range(len(road["lanes"]))[::(1 if from_zero else -1)]:
+                    in_lanes.append(road["id"] + "_" + str(n))
+            out_lanes = []
+            for road in i.out_roads:
+                from_zero = (road["endIntersection"] == i.id) if self.RIGHT else (
+                        road["startIntersection"] == i.id)
+                for n in range(len(road["lanes"]))[::(1 if from_zero else -1)]:
+                    out_lanes.append(road["id"] + "_" + str(n))
+            for lane in vehicles.keys():
+                if lane in in_lanes:
+                    pressure += vehicles[lane]
+                if lane in out_lanes:
+                    pressure -= vehicles[lane]
+            pressures[i.id] = pressure
+        return pressures
 
     def get_pressure(self):
         vehicles = self.eng.get_lane_vehicle_count()
@@ -220,6 +247,25 @@ class World(object):
                     pressure -= vehicles[lane]
             pressures[i.id] = pressure
         return pressures
+
+    def get_car_count(self):
+        vehicles = self.eng.get_lane_vehicle_count()
+        car_count = {}
+        for i in self.intersections:
+            count = 0
+            in_lanes = []
+            for road in i.in_roads:
+                from_zero = (road["startIntersection"] == i.id) if self.RIGHT else (
+                        road["endIntersection"] == i.id)
+                for n in range(len(road["lanes"]))[::(1 if from_zero else -1)]:
+                    in_lanes.append(road["id"] + "_" + str(n))
+    
+            for lane in vehicles.keys():
+                if lane in in_lanes:
+                    count += vehicles[lane]
+
+            car_count[i.id] = count
+        return car_count
 
     # return [self.dic_lane_waiting_vehicle_count_current_step[lane] for lane in self.list_entering_lanes] + \
     # [-self.dic_lane_waiting_vehicle_count_current_step[lane] for lane in self.list_exiting_lanes]
@@ -280,6 +326,35 @@ class World(object):
             lane_delay[lane] = 1 - lane_avg_speed / speed_limit
         return lane_delay
 
+
+
+    def get_state_of_three(self):
+        
+        state_of_three = {}
+        for i in self.intersections:
+            ##Pega lanes da fase atual
+            act_phase = i.current_phase
+            act_roads = i.phase_available_startlanes[act_phase]
+            ##Pega ruas da proxima fase
+            nxt_phase = (act_phase+1) % len(i.phases)
+            nxt_roads = i.phase_available_startlanes[nxt_phase]
+            ##Pega ruas das outras fases (excluindo as que ja foram incluidas no act_roads e nxt_roads)
+            otr_roads = [road for road in i.startlanes if (road not in act_roads) and (road not in nxt_roads)]
+            #print(act_roads)
+            #print(nxt_roads)
+            #print(otr_roads)
+            vehicles = self.eng.get_lane_vehicle_count()
+
+            act_vehicles = np.sum([vehicles[key] for key in vehicles if key in act_roads])  
+            nxt_vehicles = np.sum([vehicles[key] for key in vehicles if key in nxt_roads]) 
+            otr_vehicles = np.sum([vehicles[key] for key in vehicles if key in otr_roads]) 
+
+            state_of_three[i.id] = [act_vehicles,nxt_vehicles,otr_vehicles]
+
+        #print(state_of_three)
+        return state_of_three
+
+
     def get_vehicle_trajectory(self):
         # lane_id and time spent on the corresponding lane that each vehicle went through
         vehicle_lane = self.get_vehicle_lane()
@@ -299,7 +374,6 @@ class World(object):
     def get_history_vehicles(self):
         self.history_vehicles.update(self.eng.get_vehicles())
         return self.history_vehicles
-
 
     def _get_roadnet(self, cityflow_config):
         roadnet_file = osp.join(cityflow_config["dir"], cityflow_config["roadnetFile"])
@@ -337,6 +411,9 @@ class World(object):
 
     def get_info(self, info):
         return self.info[info]
+
+    def count_vehicles(self):
+        return len(self.eng.get_vehicles(include_waiting=True))
 
 
 if __name__ == "__main__":

@@ -26,6 +26,9 @@ class TSCEnv(gym.Env):
         self.action_space = gym.spaces.MultiDiscrete(action_dims)
 
         self.metric = metric
+        
+    def update_metric(self, metric):
+        self.metric = metric
 
     def step(self, actions):
         assert len(actions) == self.n_agents
@@ -34,9 +37,14 @@ class TSCEnv(gym.Env):
 
         obs = [agent.get_ob() for agent in self.agents]
         rewards = [agent.get_reward() for agent in self.agents]
-        dones = [False] * self.n_agents
-        #infos = {"metric": self.metric.update()}
-        infos = {}
+        
+        if self.world.count_vehicles() == 0:
+            dones = [True] * self.n_agents
+        else:
+            dones = [False] * self.n_agents
+
+        #infos = {"metric": self.metric.update(),"count_vehicles":self.world.count_vehicles()}
+        infos = {"count_vehicles":self.world.count_vehicles()}
 
         return obs, rewards, dones, infos
 

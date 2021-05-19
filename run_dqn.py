@@ -75,7 +75,6 @@ def train(args, env):
                 actions = []
                 for agent_id, agent in enumerate(agents):
                     if total_decision_num > agent.learning_start:
-                    #if True:
                         actions.append(agent.get_action(last_obs[agent_id]))
                     else:
                         actions.append(agent.sample())

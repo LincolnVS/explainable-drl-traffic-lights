@@ -3,6 +3,9 @@ examples/*
 !examples/.gitkeep
 *.DS_Store
 .idea/
-model/
-log/
 local/
+
+model/*
+log/*
+
+datasets/*/*/*.txt

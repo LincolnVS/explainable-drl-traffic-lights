@@ -109,9 +109,9 @@ class IntelliLightAgent(RLAgent):
 
         # print(obs_lane)
         state = State(
-            queue_length=np.reshape(np.array(lane_queue), newshape=(1, 8)),
-            num_of_vehicles=np.reshape(np.array(lane_num_vehicles), newshape=(1, 8)),
-            waiting_time=np.reshape(np.array(lane_waiting_time), newshape=(1, 8)),
+            queue_length=np.reshape(np.array(lane_queue), newshape=(1, -1)),
+            num_of_vehicles=np.reshape(np.array(lane_num_vehicles), newshape=(1, -1)),
+            waiting_time=np.reshape(np.array(lane_waiting_time), newshape=(1, -1)),
             map_feature=np.reshape(np.array(map_of_vehicles), newshape=(1, 150, 150, 1)),
             cur_phase=np.reshape(np.array([cur_phase]), newshape=(1, 1)),
             next_phase=np.reshape(np.array([next_phase]),
@@ -575,9 +575,9 @@ class IntelliLightAgent(RLAgent):
 class State(object):
     # ==========================
 
-    D_QUEUE_LENGTH = (8,)
-    D_NUM_OF_VEHICLES = (8,)
-    D_WAITING_TIME = (8,)
+    D_QUEUE_LENGTH = (12,)
+    D_NUM_OF_VEHICLES = (12,)
+    D_WAITING_TIME = (12,)
     D_MAP_FEATURE = (150,150,1,)
     D_CUR_PHASE = (1,)
     D_NEXT_PHASE = (1,)

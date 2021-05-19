@@ -1,0 +1,400 @@
+episode:0/200, steps:3600, average travel time:570.8162259076647
+agent:0, mean_episode_reward:-1.022698413477952
+episode:1/200, steps:3600, average travel time:562.5284625728373
+agent:0, mean_episode_reward:-0.9730619430351358
+episode:2/200, steps:3600, average travel time:571.2989690721649
+agent:0, mean_episode_reward:-0.9833459867357977
+episode:3/200, steps:3600, average travel time:590.9905871806365
+agent:0, mean_episode_reward:-1.0014906428075876
+episode:4/200, steps:3600, average travel time:602.2281488121919
+agent:0, mean_episode_reward:-0.9619699424429241
+episode:5/200, steps:3600, average travel time:612.4576423128642
+agent:0, mean_episode_reward:-0.9840953053737456
+episode:6/200, steps:3600, average travel time:657.677722994173
+agent:0, mean_episode_reward:-1.025120334083676
+episode:7/200, steps:3600, average travel time:596.4356790676826
+agent:0, mean_episode_reward:-0.9673282869066017
+episode:8/200, steps:3600, average travel time:563.1447781264008
+agent:0, mean_episode_reward:-0.9914140546707579
+episode:9/200, steps:3600, average travel time:588.0748543254147
+agent:0, mean_episode_reward:-0.9944202713947206
+episode:10/200, steps:3600, average travel time:646.280143433438
+agent:0, mean_episode_reward:-1.024702482561395
+episode:11/200, steps:3600, average travel time:651.6360376512774
+agent:0, mean_episode_reward:-1.0265151101934922
+episode:12/200, steps:3600, average travel time:581.6476916181085
+agent:0, mean_episode_reward:-0.986360760577161
+episode:13/200, steps:3600, average travel time:598.4123711340206
+agent:0, mean_episode_reward:-0.953485835758936
+episode:14/200, steps:3600, average travel time:635.1264007171671
+agent:0, mean_episode_reward:-0.9627525537506284
+episode:15/200, steps:3600, average travel time:618.9116987897804
+agent:0, mean_episode_reward:-0.9501655109361458
+episode:16/200, steps:3600, average travel time:641.6508292245629
+agent:0, mean_episode_reward:-0.9715520522009912
+episode:17/200, steps:3600, average travel time:652.7436127297176
+agent:0, mean_episode_reward:-0.9723313196235714
+episode:18/200, steps:3600, average travel time:671.7220977140296
+agent:0, mean_episode_reward:-1.0058294564388959
+episode:19/200, steps:3600, average travel time:661.2613177947109
+agent:0, mean_episode_reward:-1.1255561538530285
+episode:20/200, steps:3600, average travel time:573.5894217839534
+agent:0, mean_episode_reward:-1.0758808429844025
+episode:21/200, steps:3600, average travel time:578.1385029134917
+agent:0, mean_episode_reward:-1.1173630627193596
+episode:22/200, steps:3600, average travel time:556.2814881219184
+agent:0, mean_episode_reward:-1.1695940278022574
+episode:23/200, steps:3600, average travel time:521.7794710891976
+agent:0, mean_episode_reward:-1.0228317446737039
+episode:24/200, steps:3600, average travel time:483.1160914388167
+agent:0, mean_episode_reward:-0.958188116505596
+episode:25/200, steps:3600, average travel time:467.6736889287315
+agent:0, mean_episode_reward:-0.955345963016874
+episode:26/200, steps:3600, average travel time:509.16539668310173
+agent:0, mean_episode_reward:-0.9488092122607766
+episode:27/200, steps:3600, average travel time:480.3406544150605
+agent:0, mean_episode_reward:-0.9895835217509723
+episode:28/200, steps:3600, average travel time:461.7346481398476
+agent:0, mean_episode_reward:-0.9208536930786357
+episode:29/200, steps:3600, average travel time:506.1819811743613
+agent:0, mean_episode_reward:-0.9498414020464083
+episode:30/200, steps:3600, average travel time:481.90138951142984
+agent:0, mean_episode_reward:-0.9454870232976227
+episode:31/200, steps:3600, average travel time:524.4092335275661
+agent:0, mean_episode_reward:-0.9408769346709612
+episode:32/200, steps:3600, average travel time:564.9013895114299
+agent:0, mean_episode_reward:-0.9485961561058006
+episode:33/200, steps:3600, average travel time:531.2792469744509
+agent:0, mean_episode_reward:-0.9481145129056087
+episode:34/200, steps:3600, average travel time:504.1313312415957
+agent:0, mean_episode_reward:-0.9293810730399271
+episode:35/200, steps:3600, average travel time:558.4043030031376
+agent:0, mean_episode_reward:-0.9422123215891244
+episode:36/200, steps:3600, average travel time:511.363514119229
+agent:0, mean_episode_reward:-0.9228299712204117
+episode:37/200, steps:3600, average travel time:508.3119677274765
+agent:0, mean_episode_reward:-0.9640135862482995
+episode:38/200, steps:3600, average travel time:528.0282384580905
+agent:0, mean_episode_reward:-0.9750324546492125
+episode:39/200, steps:3600, average travel time:504.7893321380547
+agent:0, mean_episode_reward:-0.9640061432656781
+episode:40/200, steps:3600, average travel time:561.025997310623
+agent:0, mean_episode_reward:-0.9452850950392236
+episode:41/200, steps:3600, average travel time:617.4580905423577
+agent:0, mean_episode_reward:-0.9536442170742303
+episode:42/200, steps:3600, average travel time:605.7861945316001
+agent:0, mean_episode_reward:-0.9525008364000711
+episode:43/200, steps:3600, average travel time:615.8794262662483
+agent:0, mean_episode_reward:-0.9597538193853846
+episode:44/200, steps:3600, average travel time:609.265800089646
+agent:0, mean_episode_reward:-0.9877556033023088
+episode:45/200, steps:3600, average travel time:560.9601075750785
+agent:0, mean_episode_reward:-0.9903072802130322
+episode:46/200, steps:3600, average travel time:637.3272075302555
+agent:0, mean_episode_reward:-1.0081730499559551
+episode:47/200, steps:3600, average travel time:640.4123711340206
+agent:0, mean_episode_reward:-1.046391544416157
+episode:48/200, steps:3600, average travel time:708.4011653966832
+agent:0, mean_episode_reward:-1.0609846698874044
+episode:49/200, steps:3600, average travel time:675.6539668310174
+agent:0, mean_episode_reward:-1.0920621751948063
+episode:50/200, steps:3600, average travel time:661.308830121022
+agent:0, mean_episode_reward:-1.1325480611328396
+episode:51/200, steps:3600, average travel time:706.706409681757
+agent:0, mean_episode_reward:-1.1207902079885372
+episode:52/200, steps:3600, average travel time:698.6934110264456
+agent:0, mean_episode_reward:-1.132580594218821
+episode:53/200, steps:3600, average travel time:678.5593904078888
+agent:0, mean_episode_reward:-1.0567035944271046
+episode:54/200, steps:3600, average travel time:703.5844912595248
+agent:0, mean_episode_reward:-1.224313911122379
+episode:55/200, steps:3600, average travel time:559.4011653966832
+agent:0, mean_episode_reward:-1.0115526022314314
+episode:56/200, steps:3600, average travel time:559.0784401613627
+agent:0, mean_episode_reward:-1.020353228777162
+episode:57/200, steps:3600, average travel time:570.7032720753026
+agent:0, mean_episode_reward:-1.0272198953031098
+episode:58/200, steps:3600, average travel time:572.4733303451367
+agent:0, mean_episode_reward:-1.0250287318322364
+episode:59/200, steps:3600, average travel time:599.9350067234424
+agent:0, mean_episode_reward:-0.993548905819154
+episode:60/200, steps:3600, average travel time:615.6387270282385
+agent:0, mean_episode_reward:-1.0926200505661952
+episode:61/200, steps:3600, average travel time:564.702823845809
+agent:0, mean_episode_reward:-1.0059795411226744
+episode:62/200, steps:3600, average travel time:583.3729269385925
+agent:0, mean_episode_reward:-1.0648450630873583
+episode:63/200, steps:3600, average travel time:622.1936351411923
+agent:0, mean_episode_reward:-1.1293908537574457
+episode:64/200, steps:3600, average travel time:639.4441954280592
+agent:0, mean_episode_reward:-1.1506399471796662
+episode:65/200, steps:3600, average travel time:637.4083370685792
+agent:0, mean_episode_reward:-1.1361910479630961
+episode:66/200, steps:3600, average travel time:684.5145674585387
+agent:0, mean_episode_reward:-1.165464777555087
+episode:67/200, steps:3600, average travel time:669.7906768265352
+agent:0, mean_episode_reward:-1.1804706507049618
+episode:68/200, steps:3600, average travel time:694.658897355446
+agent:0, mean_episode_reward:-1.1620908080215273
+episode:69/200, steps:3600, average travel time:709.949798296728
+agent:0, mean_episode_reward:-1.190016514105248
+episode:70/200, steps:3600, average travel time:659.9610040340655
+agent:0, mean_episode_reward:-1.0749582839666407
+episode:71/200, steps:3600, average travel time:661.8883908561183
+agent:0, mean_episode_reward:-1.1333956936373035
+episode:72/200, steps:3600, average travel time:615.7785746302106
+agent:0, mean_episode_reward:-1.091992170977271
+episode:73/200, steps:3600, average travel time:616.6113850291349
+agent:0, mean_episode_reward:-1.0881310167065088
+episode:74/200, steps:3600, average travel time:611.4697445091887
+agent:0, mean_episode_reward:-1.065898830082271
+episode:75/200, steps:3600, average travel time:613.376064545047
+agent:0, mean_episode_reward:-1.0363756695208626
+episode:76/200, steps:3600, average travel time:604.4675033617212
+agent:0, mean_episode_reward:-1.0225296290236183
+episode:77/200, steps:3600, average travel time:649.056476916181
+agent:0, mean_episode_reward:-1.1127521598000263
+episode:78/200, steps:3600, average travel time:625.9798296727924
+agent:0, mean_episode_reward:-1.0581309759764779
+episode:79/200, steps:3600, average travel time:581.967727476468
+agent:0, mean_episode_reward:-1.0159324407791084
+episode:80/200, steps:3600, average travel time:610.5638727028238
+agent:0, mean_episode_reward:-1.0304238013191804
+episode:81/200, steps:3600, average travel time:617.632003585836
+agent:0, mean_episode_reward:-1.0288329464360233
+episode:82/200, steps:3600, average travel time:618.7525773195877
+agent:0, mean_episode_reward:-1.0191132885413359
+episode:83/200, steps:3600, average travel time:596.4294038547737
+agent:0, mean_episode_reward:-1.0121689911050311
+episode:84/200, steps:3600, average travel time:651.0461676378305
+agent:0, mean_episode_reward:-1.053835230475618
+episode:85/200, steps:3600, average travel time:630.9430748543255
+agent:0, mean_episode_reward:-1.0969586647163327
+episode:86/200, steps:3600, average travel time:631.4401613626177
+agent:0, mean_episode_reward:-1.179816820476559
+episode:87/200, steps:3600, average travel time:605.7046167637831
+agent:0, mean_episode_reward:-1.1788661191846384
+episode:88/200, steps:3600, average travel time:619.1748095024652
+agent:0, mean_episode_reward:-1.2026969855948655
+episode:89/200, steps:3600, average travel time:631.3935454952936
+agent:0, mean_episode_reward:-1.2030307407230707
+episode:90/200, steps:3600, average travel time:604.4181981174361
+agent:0, mean_episode_reward:-1.1582863411891438
+episode:91/200, steps:3600, average travel time:616.7247870909906
+agent:0, mean_episode_reward:-1.2164579984367851
+episode:92/200, steps:3600, average travel time:637.8498431196773
+agent:0, mean_episode_reward:-1.2211144620013765
+episode:93/200, steps:3600, average travel time:655.5611833258629
+agent:0, mean_episode_reward:-1.2257966321457725
+episode:94/200, steps:3600, average travel time:668.9246974450919
+agent:0, mean_episode_reward:-1.226592731355082
+episode:95/200, steps:3600, average travel time:610.2218735992828
+agent:0, mean_episode_reward:-1.2077988422957724
+episode:96/200, steps:3600, average travel time:622.0403406544151
+agent:0, mean_episode_reward:-1.1958795373695918
+episode:97/200, steps:3600, average travel time:638.8910802330794
+agent:0, mean_episode_reward:-1.2063736328054453
+episode:98/200, steps:3600, average travel time:636.2241147467504
+agent:0, mean_episode_reward:-1.2067837311735927
+episode:99/200, steps:3600, average travel time:624.5880770954728
+agent:0, mean_episode_reward:-1.1741575457463247
+episode:100/200, steps:3600, average travel time:580.3585835948005
+agent:0, mean_episode_reward:-1.1391018728611146
+episode:101/200, steps:3600, average travel time:567.0636485880771
+agent:0, mean_episode_reward:-1.1417806438011977
+episode:102/200, steps:3600, average travel time:541.6584491259525
+agent:0, mean_episode_reward:-1.0640148781350514
+episode:103/200, steps:3600, average travel time:493.17705064993277
+agent:0, mean_episode_reward:-1.0163148980992094
+episode:104/200, steps:3600, average travel time:563.5091887046168
+agent:0, mean_episode_reward:-1.0382344813689446
+episode:105/200, steps:3600, average travel time:516.5943523083819
+agent:0, mean_episode_reward:-1.0378005392054923
+episode:106/200, steps:3600, average travel time:527.8305692514567
+agent:0, mean_episode_reward:-1.0809246114330895
+episode:107/200, steps:3600, average travel time:534.7884356790677
+agent:0, mean_episode_reward:-1.0990608517726916
+episode:108/200, steps:3600, average travel time:532.9430748543255
+agent:0, mean_episode_reward:-1.0687780420497064
+episode:109/200, steps:3600, average travel time:512.698341550874
+agent:0, mean_episode_reward:-1.0563977184855857
+episode:110/200, steps:3600, average travel time:464.6234872254594
+agent:0, mean_episode_reward:-1.0097931212236424
+episode:111/200, steps:3600, average travel time:466.2644554011654
+agent:0, mean_episode_reward:-0.986038606753955
+episode:112/200, steps:3600, average travel time:482.24114746750337
+agent:0, mean_episode_reward:-0.9888844448935944
+episode:113/200, steps:3600, average travel time:542.329448677723
+agent:0, mean_episode_reward:-1.1015439639192626
+episode:114/200, steps:3600, average travel time:517.8691169878978
+agent:0, mean_episode_reward:-1.0062597894795264
+episode:115/200, steps:3600, average travel time:451.1855670103093
+agent:0, mean_episode_reward:-0.983646574759064
+episode:116/200, steps:3600, average travel time:529.1757059614523
+agent:0, mean_episode_reward:-1.0163295185729084
+episode:117/200, steps:3600, average travel time:492.0156880322725
+agent:0, mean_episode_reward:-0.9516373816503771
+episode:118/200, steps:3600, average travel time:466.5965934558494
+agent:0, mean_episode_reward:-0.9579101735324975
+episode:119/200, steps:3600, average travel time:506.11878081577765
+agent:0, mean_episode_reward:-0.9617974765567358
+episode:120/200, steps:3600, average travel time:512.5105333930973
+agent:0, mean_episode_reward:-1.011063512192528
+episode:121/200, steps:3600, average travel time:482.2025997310623
+agent:0, mean_episode_reward:-0.978715424168238
+episode:122/200, steps:3600, average travel time:468.2689376961004
+agent:0, mean_episode_reward:-0.9741776124565124
+episode:123/200, steps:3600, average travel time:528.5141192290453
+agent:0, mean_episode_reward:-1.0956521802163217
+episode:124/200, steps:3600, average travel time:507.9587628865979
+agent:0, mean_episode_reward:-1.0549691911948715
+episode:125/200, steps:3600, average travel time:490.02913491707756
+agent:0, mean_episode_reward:-1.0066047763915393
+episode:126/200, steps:3600, average travel time:503.71044374719855
+agent:0, mean_episode_reward:-1.0645279583743752
+episode:127/200, steps:3600, average travel time:495.8516360376513
+agent:0, mean_episode_reward:-1.053792741193459
+episode:128/200, steps:3600, average travel time:515.4966382787987
+agent:0, mean_episode_reward:-1.0627471874149816
+episode:129/200, steps:3600, average travel time:502.54101299865533
+agent:0, mean_episode_reward:-1.0498227320590692
+episode:130/200, steps:3600, average travel time:492.8413267593008
+agent:0, mean_episode_reward:-1.0248003629306537
+episode:131/200, steps:3600, average travel time:488.1241595696997
+agent:0, mean_episode_reward:-1.0394634651741124
+episode:132/200, steps:3600, average travel time:490.75885253249663
+agent:0, mean_episode_reward:-1.0447387411530271
+episode:133/200, steps:3600, average travel time:480.90407888839087
+agent:0, mean_episode_reward:-1.0011059804762992
+episode:134/200, steps:3600, average travel time:495.56745853877186
+agent:0, mean_episode_reward:-1.0620135236456665
+episode:135/200, steps:3600, average travel time:496.63962348722544
+agent:0, mean_episode_reward:-1.0412063314735371
+episode:136/200, steps:3600, average travel time:476.43164500224117
+agent:0, mean_episode_reward:-1.0109492948646794
+episode:137/200, steps:3600, average travel time:503.9789332138055
+agent:0, mean_episode_reward:-1.0519506864093882
+episode:138/200, steps:3600, average travel time:508.31151949798294
+agent:0, mean_episode_reward:-1.0735340604261057
+episode:139/200, steps:3600, average travel time:517.692066337965
+agent:0, mean_episode_reward:-1.0702662626973136
+episode:140/200, steps:3600, average travel time:494.5939040788884
+agent:0, mean_episode_reward:-1.0206295481261318
+episode:141/200, steps:3600, average travel time:454.1694307485433
+agent:0, mean_episode_reward:-0.9520656197197862
+episode:142/200, steps:3600, average travel time:457.91035410129984
+agent:0, mean_episode_reward:-0.9505109072969448
+episode:143/200, steps:3600, average travel time:489.05064993276557
+agent:0, mean_episode_reward:-1.0630291891084502
+episode:144/200, steps:3600, average travel time:515.4486777229941
+agent:0, mean_episode_reward:-1.0459278235757248
+episode:145/200, steps:3600, average travel time:482.4598834603317
+agent:0, mean_episode_reward:-1.0196244769221419
+episode:146/200, steps:3600, average travel time:496.8677722994173
+agent:0, mean_episode_reward:-1.0268414942727107
+episode:147/200, steps:3600, average travel time:472.8377409233528
+agent:0, mean_episode_reward:-0.998771799351294
+episode:148/200, steps:3600, average travel time:460.7243388614971
+agent:0, mean_episode_reward:-0.99060150792431
+episode:149/200, steps:3600, average travel time:513.4576423128642
+agent:0, mean_episode_reward:-1.0260233325018275
+episode:150/200, steps:3600, average travel time:467.30255490811294
+agent:0, mean_episode_reward:-0.9584017863597534
+episode:151/200, steps:3600, average travel time:468.50336172120126
+agent:0, mean_episode_reward:-0.9362526313122188
+episode:152/200, steps:3600, average travel time:468.03630658897356
+agent:0, mean_episode_reward:-0.9242170584503003
+episode:153/200, steps:3600, average travel time:423.0891976692066
+agent:0, mean_episode_reward:-0.9093948361951919
+episode:154/200, steps:3600, average travel time:502.49305244285074
+agent:0, mean_episode_reward:-1.0057094524650976
+episode:155/200, steps:3600, average travel time:448.2658000896459
+agent:0, mean_episode_reward:-0.9383399938371136
+episode:156/200, steps:3600, average travel time:467.47870909905873
+agent:0, mean_episode_reward:-0.9762222909526264
+episode:157/200, steps:3600, average travel time:445.6042133572389
+agent:0, mean_episode_reward:-0.9325276575925399
+episode:158/200, steps:3600, average travel time:401.7391304347826
+agent:0, mean_episode_reward:-0.9429347308842035
+episode:159/200, steps:3600, average travel time:415.0587180636486
+agent:0, mean_episode_reward:-0.9191356718372111
+episode:160/200, steps:3600, average travel time:475.8471537427163
+agent:0, mean_episode_reward:-1.0464974833129315
+episode:161/200, steps:3600, average travel time:441.1443298969072
+agent:0, mean_episode_reward:-0.92763590514578
+episode:162/200, steps:3600, average travel time:431.83684446436575
+agent:0, mean_episode_reward:-0.942788311287355
+episode:163/200, steps:3600, average travel time:446.38951142985206
+agent:0, mean_episode_reward:-0.9445601449700606
+episode:164/200, steps:3600, average travel time:477.4087852980726
+agent:0, mean_episode_reward:-1.0367906257141553
+episode:165/200, steps:3600, average travel time:470.19004930524426
+agent:0, mean_episode_reward:-0.9752999138583234
+episode:166/200, steps:3600, average travel time:474.98834603316897
+agent:0, mean_episode_reward:-1.0152062056820725
+episode:167/200, steps:3600, average travel time:434.0645450470641
+agent:0, mean_episode_reward:-1.0027506369978272
+episode:168/200, steps:3600, average travel time:452.78171223666516
+agent:0, mean_episode_reward:-1.0153358094869362
+episode:169/200, steps:3600, average travel time:468.8700134468848
+agent:0, mean_episode_reward:-1.0207392910213722
+episode:170/200, steps:3600, average travel time:487.56656207978483
+agent:0, mean_episode_reward:-1.0422087028455809
+episode:171/200, steps:3600, average travel time:484.5203944419543
+agent:0, mean_episode_reward:-1.077058869194509
+episode:172/200, steps:3600, average travel time:467.17256835499774
+agent:0, mean_episode_reward:-1.0576385507498647
+episode:173/200, steps:3600, average travel time:474.30703720304797
+agent:0, mean_episode_reward:-1.0623697958908973
+episode:174/200, steps:3600, average travel time:485.6916181084715
+agent:0, mean_episode_reward:-1.0810727144809116
+episode:175/200, steps:3600, average travel time:480.58538771851187
+agent:0, mean_episode_reward:-1.0639813683369996
+episode:176/200, steps:3600, average travel time:461.6808606006275
+agent:0, mean_episode_reward:-1.021470488472882
+episode:177/200, steps:3600, average travel time:457.2626624831914
+agent:0, mean_episode_reward:-1.034800929749698
+episode:178/200, steps:3600, average travel time:498.5082922456298
+agent:0, mean_episode_reward:-1.0220848335153467
+episode:179/200, steps:3600, average travel time:452.62483191393994
+agent:0, mean_episode_reward:-1.0134798024560683
+episode:180/200, steps:3600, average travel time:461.09188704616764
+agent:0, mean_episode_reward:-0.9973874568297548
+episode:181/200, steps:3600, average travel time:478.70685791125055
+agent:0, mean_episode_reward:-1.03625515641563
+episode:182/200, steps:3600, average travel time:479.6073509636934
+agent:0, mean_episode_reward:-1.0267073992745643
+episode:183/200, steps:3600, average travel time:473.61228148812194
+agent:0, mean_episode_reward:-1.0414246802911733
+episode:184/200, steps:3600, average travel time:470.1268489466607
+agent:0, mean_episode_reward:-1.0111135056654228
+episode:185/200, steps:3600, average travel time:486.6718960107575
+agent:0, mean_episode_reward:-1.010705816891822
+episode:186/200, steps:3600, average travel time:494.30703720304797
+agent:0, mean_episode_reward:-1.0144491064910632
+episode:187/200, steps:3600, average travel time:505.9435230838189
+agent:0, mean_episode_reward:-1.0267109183613192
+episode:188/200, steps:3600, average travel time:486.4585387718512
+agent:0, mean_episode_reward:-0.9818724347772964
+episode:189/200, steps:3600, average travel time:423.08606006275215
+agent:0, mean_episode_reward:-0.9316544845498818
+episode:190/200, steps:3600, average travel time:431.5867324069924
+agent:0, mean_episode_reward:-0.9359452636514163
+episode:191/200, steps:3600, average travel time:440.3706857911251
+agent:0, mean_episode_reward:-0.9569143959164688
+episode:192/200, steps:3600, average travel time:432.8166741371582
+agent:0, mean_episode_reward:-0.9409972728404382
+episode:193/200, steps:3600, average travel time:425.03809950694756
+agent:0, mean_episode_reward:-0.9178755034338236
+episode:194/200, steps:3600, average travel time:429.1474675033617
+agent:0, mean_episode_reward:-0.946065144468139
+episode:195/200, steps:3600, average travel time:444.6042133572389
+agent:0, mean_episode_reward:-0.9614124618710831
+episode:196/200, steps:3600, average travel time:438.2227700582698
+agent:0, mean_episode_reward:-0.981328742568798
+episode:197/200, steps:3600, average travel time:407.7113402061856
+agent:0, mean_episode_reward:-0.949684347445864
+episode:198/200, steps:3600, average travel time:427.676826535186
+agent:0, mean_episode_reward:-0.9648178092978643
+episode:199/200, steps:3600, average travel time:416.0022411474675
+agent:0, mean_episode_reward:-0.9496553946018693
