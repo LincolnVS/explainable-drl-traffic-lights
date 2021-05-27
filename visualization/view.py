@@ -17,7 +17,6 @@ from pathlib import Path
 parser = argparse.ArgumentParser(description='Run Example')
 parser.add_argument('log_to_view', type=str, help='path of log file')
 parser.add_argument('--save_dir', type=str, default="out", help='directory in which model should be saved')
-
 args = parser.parse_args()
 
 
@@ -138,6 +137,11 @@ def get_infos_log(path):
     return average_travel_time,steps_to_end
 
 in_path = Path(args.log_to_view)
+
+if in_path.is_dir():
+    *_, last = Path(in_path).glob('**/*.log')
+
+in_path = last
 dir_path = in_path.parent
 
 out_path = f"{Path(__file__).resolve().parent}/{args.save_dir}_{in_path.stem}"
