@@ -8,4 +8,5 @@ local/
 model/*
 log/*
 
+visualization/out*
 datasets/*/*/*.txt

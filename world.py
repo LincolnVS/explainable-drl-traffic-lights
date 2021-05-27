@@ -181,7 +181,7 @@ class World(object):
             "lane_vehicles": self.eng.get_lane_vehicles,
             "time": self.eng.get_current_time,
             "vehicle_distance": self.eng.get_vehicle_distance,
-            "pressure": self.get_pressure_waiting,
+            "pressure": self.get_pressure,
             "lane_waiting_time_count": self.get_lane_waiting_time_count,
             "lane_delay": self.get_lane_delay,
             "vehicle_trajectory": self.get_vehicle_trajectory,
@@ -343,7 +343,7 @@ class World(object):
             #print(act_roads)
             #print(nxt_roads)
             #print(otr_roads)
-            vehicles = self.eng.get_lane_vehicle_count()
+            vehicles = self.eng.get_lane_waiting_vehicle_count()
 
             act_vehicles = np.sum([vehicles[key] for key in vehicles if key in act_roads])  
             nxt_vehicles = np.sum([vehicles[key] for key in vehicles if key in nxt_roads]) 
