@@ -1,19 +1,31 @@
    
 import numpy as np
-from pathlib import Path
+
 import ast 
 import matplotlib.pyplot as plt
-from datetime import datetime
 
 import seaborn as sns
 sns.set_theme(style="darkgrid")
-
 import pandas as pd
-
-
 import pickle
 
+import argparse
 
+from pathlib import Path
+
+
+parser = argparse.ArgumentParser(description='Run Example')
+parser.add_argument('log_to_view', type=str, help='path of log file')
+parser.add_argument('--save_dir', type=str, default="out", help='directory in which model should be saved')
+
+args = parser.parse_args()
+
+
+def _copy(self, target):
+    import shutil
+    assert self.is_file()
+    shutil.copy(str(self), str(target))  # str() only there for Python < (3, 6)
+Path.copy = _copy
 
 def get_infos(_path,num_epis=160):
     all_rewards = []
@@ -100,7 +112,7 @@ def get_infos_log(path):
     num_lines = 0
     ## Abrir arquivo
     try:
-        f = open(f"{path}/log.log", "r")
+        f = open(f"{path}", "r")
     except:
         return []
 
@@ -125,19 +137,21 @@ def get_infos_log(path):
     
     return average_travel_time,steps_to_end
 
-_path = f"mydqn/"
+in_path = Path(args.log_to_view)
+dir_path = in_path.parent
 
-paths = [_path,_path]
-print(paths)
+out_path = f"{Path(__file__).resolve().parent}/{args.save_dir}_{in_path.stem}"
+
+Path(out_path).mkdir(parents=True, exist_ok=True)
+in_path.copy(f"{out_path}/{in_path.name}")
+
+
 average_time_travel = []
 total_time = []
 
-for path in paths:
-    att, steps = get_infos_log(path)
-    average_time_travel.append(att)
-    total_time.append(steps)
-
-path = "mydqn/"
+att, steps = get_infos_log(in_path)
+average_time_travel.append(att)
+total_time.append(steps)
 
 min_att,mean_att,max_att = [],[],[]
 min_tt,mean_tt,max_tt = [],[],[]
@@ -154,16 +168,8 @@ for a in range(len(average_time_travel.iloc[0])):
     mean_tt.append(np.mean(total_times[a]))
     max_tt.append(np.mean(total_times[a]) + np.std(total_times[a]))
 
-save_values(f"{path}/tt",[min_tt,mean_tt,max_tt])
-save_values(f"{path}/att",[min_att,mean_att,max_att])
+save_values(f"{out_path}/tt",[min_tt,mean_tt,max_tt])
+save_values(f"{out_path}/att",[min_att,mean_att,max_att])
 
-
-#plots_features_and_area_and_fixedtime(path,"num_car","",max_mnc,mean_mnc,min_mnc, fixed_info_15[0], fixed_info_30[0], fixed_info_45[0], xlabel = 'step',ylabel ='cars')
-#plots_features_and_area_and_fixedtime(path,"time_travel","",max_mtt,mean_mtt,min_mtt, fixed_info_15[1], fixed_info_30[1], fixed_info_45[1], xlabel = 'step',ylabel ='seconds')
-#plots_features_and_area_and_fixedtime(path,"time_total","",max_tt,mean_tt,min_tt, fixed_info_15[2], fixed_info_30[2], fixed_info_45[2], xlabel = 'step',ylabel ='seconds')
-#plots_features_and_area_and_fixedtime(path,"average_vel","",max_av,mean_av,min_av, fixed_info_15[3], fixed_info_30[3], fixed_info_45[3], xlabel = 'step',ylabel ='vel')
-#plots_features_and_area_and_fixedtime(path,"average_waiting","",max_aw,mean_aw,min_aw, fixed_info_15[4], fixed_info_30[4], fixed_info_45[4], xlabel = 'step',ylabel ='seconds')
-
-
-plots_features_and_area(path,"time_travel","",max_att,mean_att,min_att, xlabel = 'step',ylabel ='seconds')
-plots_features_and_area(path,"time_total","",max_tt,mean_tt,min_tt, xlabel = 'step',ylabel ='seconds')
+plots_features_and_area(out_path,"time_travel","",max_att,mean_att,min_att, xlabel = 'step',ylabel ='seconds')
+plots_features_and_area(out_path,"time_total","",max_tt,mean_tt,min_tt, xlabel = 'step',ylabel ='seconds')
