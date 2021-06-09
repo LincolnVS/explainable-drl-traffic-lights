@@ -6,6 +6,9 @@ from keras.utils import plot_model
 from keras.models import Sequential,Model
 from keras.layers import Dense,Input,concatenate
 from keras.optimizers import Adam, RMSprop, SGD
+import tensorflow as tf
+from tensorflow.keras import initializers
+from keras.losses import Huber
 import os
 from agent.SamplerAlgorithms import ProportionalSampler2 as ProportionalSampler
 import time
@@ -14,73 +17,95 @@ def current_milli_time():
     return round(time.time() * 1000)
 
 class DQNAgent(RLAgent):
-    def __init__(self, action_space, ob_generator, reward_generator, i, world):
+    def __init__(self, action_space, ob_generator, reward_generator, i, world,log_path,info_file):
+        self.ob_generator = ob_generator
+        self.reward_generator = reward_generator
         super().__init__(action_space, ob_generator, reward_generator)
         
+        self.log_path = log_path     
         self.state_with_phase = False
 
         self.I = i
         self.iid = i.id
 
-        self.ob_length = ob_generator.ob_length
+        self.ob_shape = ob_generator.ob_shape
 
         self.world = world
         self.world.subscribe("pressure")
         self.world.subscribe("car_count")
         self.world.subscribe("lane_count")
 
-        self.batch_size = 2000
-        self.memory = deque(maxlen=4000)
-        self.learning_start = 2000
-        self.update_model_freq = 1
-        self.update_target_model_freq = 1
+        self.batch_size = info_file['batch_size']
+        self.buffer_size = self.batch_size*info_file['batch_size']
+        self.memory = deque(maxlen=self.buffer_size)
+        self.learning_start = info_file['learning_start']
+        self.update_model_freq = info_file['update_model_freq'] #cada 25 ciclos 
+        self.update_target_model_freq = info_file['update_target_model_freq']
 
-        self.gamma = 0.99  # discount rate
-        self.epsilon = 0.1  # exploration rate
-        self.epsilon_min = 0.01
-        self.epsilon_decay = 0.995
-        self.learning_rate = 0.005
+        self.gamma = info_file['gamma'] # discount rate
+        self.epsilon_start = info_file['epsilon_start'] #1 # exploration rate
+        self.epsilon = self.epsilon_start 
+        self.epsilon_min = info_file['epsilon_min'] 
+        self.epsilon_decay = info_file['epsilon_decay'] #.1/175 #0.975
+        self.decay_type = info_file['decay_type']
+
+        self.learning_rate_model = info_file['learning_rate_model']
+        self.epochs_first_replay =info_file['epochs_first_replay']
+        self.epochs_replay = info_file['epochs_replay']
         
+        self.activation=info_file['activation']
+
         self.actual_phase = -1
         self.last_phase = -1
         self.total_decision = 0
+        self.n_phases = len(self.I.phases)
+        self.start_phase = 0
 
         self.model = self._build_model()
         self.target_model = self._build_model()
         self.update_target_network()
 
-        self.sampler_algorithm = ProportionalSampler(len(self.memory),self.batch_size)
+        self.sampler_algorithm = ProportionalSampler(self.buffer_size,self.batch_size)
         self.flag_treino_inicial = True
 
         self.current_reward = []
         self.episode_action_time = 0
         self.action_time = 0
 
+        self.random_list_values = [0,5,10,15,20,25]
+        self.random_coefficient = (self.learning_start+1)/len(self.random_list_values)
+
     def get_phase(self):
         return self.actual_phase
 
     def next_phase(self,phase):
-        if phase < len(self.I.phases)-1:
+        if phase < self.start_phase+self.n_phases-1:
             return phase + 1
         else:
-            return 0
+            return self.start_phase
 
     def change_phase(self):
         if self.actual_phase == -1:
-            self.actual_phase = 0
-            self.last_phase = 7
+            self.actual_phase = self.start_phase
+            self.last_phase = self.start_phase + self.n_phases - 1
             return
         self.last_phase = self.actual_phase
-        if self.actual_phase < len(self.I.phases)-1:
+        
+        if self.actual_phase < self.start_phase+self.n_phases-1:
             self.actual_phase += 1
         else:
-            self.actual_phase = 0
+            self.actual_phase = self.start_phase
 
     def get_pressures_reward(self):
         #print(self.world.get_info("pressure"))
         pressure = self.world.get_info("pressure")[self.iid]
         return pressure
 
+    def real_reward(self,first_obs,current_obs):
+        reward = np.subtract(first_obs,current_obs)
+        weights = [1.5,1.5,1]#[2,1.5,1]
+        reward =  np.multiply(reward,weights)
+        return np.round(np.sum(reward),3)
 
     def get_reward(self,last_pressure=0):
         pressures = self.get_pressures_reward()/100
@@ -92,24 +117,29 @@ class DQNAgent(RLAgent):
         self.total_decision += 1
 
         if self.total_decision < self.learning_start:
-            #return self.sample()
-            return np.random.choice([self.sample(),0,5,10,15], 1, p=[0.2, 0.1, 0.3, 0.3, 0.1])[0]
-            #return np.random.choice([0,5,10,15], 1)[0]
+
+            #value = 5*round(self.total_decision/200)
+            #if value > self.action_space.n:
+            #    value = random.choice([0,5,10,15,20,25])
+            #value = np.floor(self.total_decision/self.random_coefficient).astype(int)
+            #return self.random_list_values[value]
+            return self.sample()
+
         else:
             if np.random.rand() <= self.epsilon:
                 return self.sample()
 
             ob = self._reshape_ob(ob)
+            
             if self.state_with_phase:
                 phase = self._reshape_ob(self.actual_phase/7)
                 act_values = self.model.predict([ob,phase])
             else:
-                act_values = self.model.predict(ob)
+                act_values = self.model.predict(ob)[0]
 
             #print(act_values)
-            #print([ob,phase])
+            return np.argmax(act_values)
 
-            return np.argmax(act_values[0])
     def reset_episode_infos(self):
         self.actual_phase = -1
         self.last_phase = -1
@@ -118,49 +148,32 @@ class DQNAgent(RLAgent):
         self.action_time = 0
 
     def sample(self):
-        return np.random.randint(0, 23)
+        return np.random.randint(0, self.action_space.n)
 
     def _build_model(self):
         # Neural Net for Deep-Q learning Model
-        if self.state_with_phase:
-            inputA = Input(shape= (self.ob_length,), name='state_input')
-            inputB = Input(shape=(1,), name='phase_input')
+        
+        model = Sequential()
+        model.add(Dense(35, activation='relu', name='fc_input', input_shape=self.ob_shape))
 
-            A = Model(inputs=inputA, outputs=inputA)
+        #model.add(Dense(512, activation="relu", name='fc_h1',kernel_initializer = initializer))
+        #model.add(Dense(512, activation="relu", name='fc_h2',kernel_initializer = initializer))
+        model.add(Dense(35, activation="relu", name='fc_h3') )      
+        model.add(Dense(self.action_space.n, activation=self.activation,name='fc_output') )
+        model.summary()
 
-            B = Model(inputs=inputB, outputs=inputB)
-            
-            combined = concatenate([A.output,B.output])
-            z = Dense(16, activation="relu", name='fc_h0d')(combined)
-            z = Dense(256, activation="relu", name='fc_h1')(z)
-            z = Dense(529, activation="relu", name='fc_h2')(z)
-            #z = Dense(20, activation="relu", name='fc_h2')(z)
-            #z = Dense(512, activation="relu", name='fc_h3')(z)
-            z = Dense(self.action_space.n,activation="linear",name='fc_output')(z)
-            model = Model(inputs=[A.input, B.input], outputs=z)
-
-            model.compile(optimizer=RMSprop(lr=0.001),
-                            loss='mse')
-            model.summary()
-            #model.compile(loss='mse', optimizer='adam')
-            plot_model(model, "model.png", show_shapes=True)
-        else:
-            model = Sequential()
-            model.add(Dense(20, activation='relu', name='fc_input', input_shape=(self.ob_length,)))
-            model.add(Dense(self.action_space.n*2, activation="relu", name='fc_h1'))
-            #model.add(Dense(20, activation="relu", name='fc_h2'))
-            #model.add(Dense(512, activation="relu", name='fc_h3'))
-            model.add(Dense(self.action_space.n,activation="tanh",name='fc_output'))
-            model.compile(loss='mse', optimizer=RMSprop(lr=0.001), metrics=['accuracy'])
-            model.summary()
-            
-            plot_model(model, "model.png", show_shapes=True)
-
+        model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
+        plot_model(model, f"{self.log_path}_model.png", show_shapes=True)
 
         return model
 
     def _reshape_ob(self, ob):
-        return np.reshape(ob, (1, -1))
+        #return np.reshape(ob, (1, -1))
+        return np.array(ob)[None]
+
+    def _reshape_ob_array(self, ob_array):
+        narray = [np.reshape(ob, (1, -1)) for ob in ob_array]
+        return narray
 
     def update_target_network(self):
         if self.total_decision > self.learning_start and not(self.total_decision%self.update_target_model_freq):
@@ -168,60 +181,64 @@ class DQNAgent(RLAgent):
             self.target_model.set_weights(weights)
 
     def remember(self, ob,  action, reward, next_ob):
-        self.memory.append((ob,action, reward, next_ob))
+        #PASSAR LISTA PARA O DEQUE (não array) SE NÃO DA MERDA
+        self.memory.append([ob, action, reward, next_ob])
 
     def replay(self):
-        #minibatch = random.sample(self.memory, self.batch_size)
 
-        #print('Get Sample buffer')
-        indexes = self.sampler_algorithm.get_sample(self.memory)
+        if self.total_decision < self.learning_start:
+            return None 
+        if self.total_decision % self.update_model_freq: 
+            return None 
 
-        minibatch = [self.memory[i] for i in indexes]
-
+        minibatch = self.sampler_algorithm.get_sample(self.memory)
+        
         _obs, actions, rewards, _next_obs = [np.stack(x) for x in np.array(minibatch).T]
 
         obs,phase = [np.stack(x) for x in np.array(_obs).T]
+        obs =  np.array(obs)
         next_obs,next_phase = [np.stack(x) for x in np.array(_next_obs).T]
- 
-        if self.state_with_phase:
-            #print('Get next values')
-            target = self.model.predict([obs,phase])
-            q_next_states = self.target_model.predict([next_obs,next_phase])
+        next_obs =  np.array(next_obs)
+        #t_next_obs =  self._reshape_ob_array(next_obs)
 
-            
-            #print('Update values')
-            # Update values according to Deep Q-Learnig algorithm
-            for i, action in enumerate(actions):
-                if self.flag_treino_inicial:
-                    target[i][action] = rewards[i]
-                else: # yj = rj + gamma * Q(s', a', theta)
-                    target[i][action] = rewards[i] + self.gamma * np.max(q_next_states[i])
-
-            #print('Fit Model')
-            epocas = 1000 if self.flag_treino_inicial else 1
-            history = self.model.fit([obs,phase], target, epochs=epocas, verbose=0)
+        q2 = self.target_model.predict(next_obs)
+        
+        if self.flag_treino_inicial:
+            delta = rewards
+            targets = np.zeros_like(self.model.predict(obs))
         else:
-            #print('Get next values')
-            target = rewards + self.gamma * np.amax(self.target_model.predict(next_obs), axis=1)
-            target_f = self.model.predict(obs)
-            for i, action in enumerate(actions):
-                target_f[i][action] = target[i]
+            delta = rewards + self.gamma * np.max(q2, axis=1)
+            targets = self.model.predict(obs)
 
+        print('\n--------------------')
+        print(obs[0],actions[0],rewards[0],next_obs[0],delta[0],targets[0][actions[0]])
+        
+        n_obs = []
+        dict_obs = {}
 
-            #print('Fit Model')
-            epocas = 1000 if self.flag_treino_inicial else 1
-            history = self.model.fit(obs, target_f, epochs=epocas, verbose=0)
-            print(f"loss: {np.mean(history.history['loss'])}")
+        for i,action in enumerate(actions):
+            if obs[i].tolist() in n_obs:
+                key = str(obs[i].tolist())
+                valores = dict_obs[key]
+                dict_obs[key].append(i)
+                last_idx = valores[-1]
+                del valores[-1]
+                targets[last_idx][action] = delta[i]
+                targets[i] = targets[last_idx]
+                for v in valores:
+                    targets[v] = targets[i]
+            else:
+                key = str(obs[i].tolist())
+                n_obs.append(obs[i].tolist())
+                dict_obs[key] = [i]
+                targets[i][action] = delta[i] 
+        
+        epocas = self.epochs_first_replay if self.flag_treino_inicial else self.epochs_replay
+        history = self.model.fit(obs, targets, epochs=epocas, verbose=0)
+        print(f"loss: {np.mean(history.history['loss'])}") if self.flag_treino_inicial else None
 
         self.flag_treino_inicial = False
 
-        '''
-        target = rewards + self.gamma * np.amax(self.target_model.predict([next_obs,next_phase]), axis=1)
-        target_f = self.model.predict([obs,phase])
-        for i, action in enumerate(actions):
-            target_f[i][action] = target[i]
-        history = self.model.fit([obs,phase], target_f, epochs=1, verbose=0)
-        '''
     def load_model(self, dir="model/dqn"):
         name = "dqn_agent_{}.h5".format(self.iid)
         model_name = os.path.join(dir, name)
@@ -233,4 +250,7 @@ class DQNAgent(RLAgent):
         self.model.save_weights(model_name)
 
     def decay_epsilon(self):
-        self.epsilon = np.max([self.epsilon*self.epsilon_decay,self.epsilon_min])
+        if self.decay_type == "linear":
+            self.epsilon = np.max([self.epsilon-self.epsilon_decay,self.epsilon_min])
+        else:
+            self.epsilon = np.max([self.epsilon*self.epsilon_decay,self.epsilon_min])

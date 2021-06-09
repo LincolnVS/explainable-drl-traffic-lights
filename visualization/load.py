@@ -10,12 +10,7 @@ sns.set_theme(style="darkgrid")
 
 import pandas as pd
 
-
 import pickle
-
-
-
-
 
 def plots_features_and_area_and_fixedtime(_path,name,index,max_v,mean_v,min_v,fi15,fi30,fi45,xlabel = 'step',ylabel ='cars',position='best'):
     

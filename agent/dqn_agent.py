@@ -66,10 +66,23 @@ class DQNAgent(RLAgent):
     def replay(self):
         minibatch = random.sample(self.memory, self.batch_size)
         obs, actions, rewards, next_obs = [np.stack(x) for x in np.array(minibatch).T]
-        target = rewards + self.gamma * np.amax(self.target_model.predict(next_obs), axis=1)
+
+        target_values_predict = np.amax(self.target_model.predict(next_obs), axis=1)
+        print(rewards[0], target_values_predict[0])
+
+        target = rewards + self.gamma * target_values_predict
         target_f = self.model.predict(obs)
+
+
         for i, action in enumerate(actions):
             target_f[i][action] = target[i]
+
+        Q(s,a) <- R(s,a) + gamma * max(Q(n_s,a))
+
+        Q(s,a) <- R(s,a) + gamma * max(Q(n_s,a)) -  Q(s,a)
+        Q(s,a) <- R(s,a) + gamma * max(Q(n_s,a)) -  Q(s,a)
+
+
         history = self.model.fit(obs, target_f, epochs=1, verbose=0)
         #print(history.history['loss'])
         if self.epsilon > self.epsilon_min:

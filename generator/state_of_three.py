@@ -39,7 +39,7 @@ class StateOfThreeGenerator(BaseGenerator):
         #size = sum(len(x) for x in self.lanes)
         size = 3
 
-        self.ob_length = len(fns) * size
+        self.ob_shape = np.array([0,0,0]).shape
 
         self.average = average
         self.negative = negative

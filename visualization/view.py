@@ -13,12 +13,10 @@ import argparse
 
 from pathlib import Path
 
-
 parser = argparse.ArgumentParser(description='Run Example')
 parser.add_argument('log_to_view', type=str, help='path of log file')
 parser.add_argument('--save_dir', type=str, default="out", help='directory in which model should be saved')
 args = parser.parse_args()
-
 
 def _copy(self, target):
     import shutil
@@ -104,10 +102,13 @@ def save_values(string,value):
     pickle.dump(value, f)
     f.close()
 
-
 def get_infos_log(path):
     average_travel_time = []
     steps_to_end = []
+
+    mean_episode_reward = []
+    epsilon = []
+
     num_lines = 0
     ## Abrir arquivo
     try:
@@ -126,11 +127,16 @@ def get_infos_log(path):
             continue
         
         sub_line = sub_line.split(',')
-        if(sub_line[-1][1:8]=="average"):
-            steps = float(sub_line[1].split(":")[-1][:])
+        if("average travel time" in sub_line[-1]):
+            try:
+                steps = float(sub_line[1].split(":")[-1][:])
+            except:
+                steps = 0
             att = float(sub_line[-1].split(":")[-1][:])
             steps_to_end.append(steps)
             average_travel_time.append(att)
+        #if("mean_episode_reward" in sub_line[-1]):
+            #print('mean')
 
     f.close()
     
@@ -176,4 +182,4 @@ save_values(f"{out_path}/tt",[min_tt,mean_tt,max_tt])
 save_values(f"{out_path}/att",[min_att,mean_att,max_att])
 
 plots_features_and_area(out_path,"time_travel","",max_att,mean_att,min_att, xlabel = 'step',ylabel ='seconds')
-plots_features_and_area(out_path,"time_total","",max_tt,mean_tt,min_tt, xlabel = 'step',ylabel ='seconds')
+plots_features_and_area(out_path,"reward","",max_tt,mean_tt,min_tt, xlabel = 'step',ylabel ='seconds')

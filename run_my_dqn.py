@@ -22,9 +22,8 @@ parser.add_argument('--load_model', action="store_true", default=False)
 parser.add_argument("--save_rate", type=int, default=20, help="save model once every time this many episodes are completed")
 parser.add_argument('--save_dir', type=str, default="model/my_dqn", help='directory in which model should be saved')
 parser.add_argument('--log_dir', type=str, default="log/my_dqn", help='directory in which logs should be saved')
+parser.add_argument('--info_file', type=str, default="configs_mdqn/default.json", help='path to the file with informations about the model')
 args = parser.parse_args()
-
-
 
 if not os.path.exists(args.log_dir):
     os.makedirs(args.log_dir)
@@ -32,12 +31,21 @@ if not os.path.exists(args.log_dir):
 file_name = f"{args.log_dir}/{datetime.now().strftime('%Y%m%d-%H%M%S')}"
 logger = logging.getLogger('main')
 logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler(os.path.join(args.log_dir, datetime.now().strftime('%Y%m%d-%H%M%S') + ".log"))
+fh = logging.FileHandler(file_name + ".log")
 fh.setLevel(logging.DEBUG)
 sh = logging.StreamHandler()
 sh.setLevel(logging.INFO)
 logger.addHandler(fh)
 logger.addHandler(sh)
+
+#Get file with informations
+info_file = u.get_info_file(args.info_file)
+offset_phase_train = info_file['offset_phase_train']
+offset_phase = info_file['offset_phase']
+flag_default_reward = info_file['flag_default_reward']
+flag_mean_reward = info_file['flag_mean_reward']
+
+episodes = args.episodes if info_file['flag_arg_episode'] else info_file['episodes']
 
 # create world
 world = World(args.config_file, thread_num=args.thread)
@@ -48,16 +56,19 @@ yellow_phase_time = 0
 agents = []
 for i in world.intersections:
     yellow_phase_time = i.yellow_phase_time
-    action_space = gym.spaces.Discrete(23)
+    action_space = gym.spaces.Discrete(26)
     agents.append(DQNAgent(
         action_space,
         StateOfThreeGenerator(world, i, ["state_of_three"], in_only=True, average=None),
         LaneVehicleGenerator(world, i, ["lane_waiting_count"], in_only=True, average="all", negative=True),
         i,
-        world
+        world,
+        file_name,
+        info_file
     ))
     if args.load_model:
         agents[-1].load_model(args.save_dir)
+
 
 
 print(i.phases)
@@ -72,11 +83,11 @@ n_agents = len(agents)
 
 # train dqn_agent
 def train(args, env):
-    for e in range(args.episodes):
+    for e in range(episodes):
 
         for agent in agents: agent.reset_episode_infos()
 
-        first_obs = env.reset()
+        first_obs = np.array(env.reset())
         current_obs = first_obs
 
         if e % args.save_rate == args.save_rate - 1:
@@ -98,57 +109,79 @@ def train(args, env):
                 if agent.episode_action_time <= i:
                     if agent.episode_action_time == i:
                         agent.change_phase()
+                        agent.replay() 
                         #agent.action_time = -1
 
-                    if agent.episode_action_time+yellow_phase_time+1 == i:
+                    if agent.episode_action_time+yellow_phase_time+offset_phase == i:
+                        #print(first_obs[agent_id], agent_obs)
+                        #print("----")
+                        first_obs[agent_id] = agent_obs
                         time = agent.get_action(first_obs[agent_id])
-                        first_obs[agent_id] = current_obs[agent_id]
                         agent.action_time = time
                         agent.episode_action_time += 10 + time*2 ## Parte de 15 segundos +  tempo decidido pelo modelo (15,17,19,21,23...)
-                    
+                        
+                        phase = agent.I.current_phase
 
             ### Para cada action interval
             for _ in range(args.action_interval):
                 actions = [agent.get_phase() for agent in agents]
                 current_obs, current_rewards, dones, current_info = env.step(actions)
-                current_obs = (np.array(current_obs)/100).tolist()
+                current_obs = np.array(current_obs)
                 i += 1
-                #u.append_new_line_states(file_name+"_0",[e,i,first_obs,current_obs,agents[0].get_phase(),agents[0].I.current_phase])
-
+                
+                #u.append_new_line_states(file_name+"_0",[e,i,first_obs,current_obs,[agents[0].get_phase(),agents[0].I.current_phase],[current_rewards[0],agents[0].real_reward(first_obs[0],current_obs[0])]])
+                
                 for agent_id, agent in enumerate(agents):
-                    agent.current_reward.append(current_rewards[agent_id])
 
-                    if agent.episode_action_time+yellow_phase_time == i:
+
+                    reward = agent.real_reward(first_obs[agent_id],current_obs[agent_id])
+                    
+                    agent.current_reward.append(current_rewards[agent_id]) if flag_default_reward else agent.current_reward.append(reward) 
+
+                    if agent.episode_action_time+yellow_phase_time+offset_phase == i:
                         action_time = agent.action_time
-                        #agent_reward = agent.current_reward[-1] + agent.current_reward[0]
-                        agent_reward = np.mean(agent.current_reward)
-                        agent.current_reward = []
-                        phase = agent.actual_phase/7
-                        next_p = agent.next_phase(agent.actual_phase)/7
 
+                        agent_reward = np.mean(agent.current_reward) if flag_mean_reward else agent.current_reward[-yellow_phase_time]
+
+                        agent.current_reward = []
+
+                        phase = agent.actual_phase
+                        next_p = agent.next_phase(phase)
 
                         u.append_new_line(file_name+f"_{agent_id}",[[first_obs[agent_id],phase], action_time, agent_reward, [current_obs[agent_id],next_p],e,i])
-                        agent.remember([first_obs[agent_id],phase], action_time, agent_reward, [current_obs[agent_id],next_p])
+                        ob = first_obs[agent_id].tolist()
+                        nob = current_obs[agent_id].tolist()
+                        agent.remember( [ob,phase] , action_time, agent_reward, [nob,next_p])
                             
                         episodes_rewards[agent_id] += agent_reward
                         episodes_decision_num[agent_id] += 1
 
-
         if agent.total_decision > agent.learning_start:
             agent.decay_epsilon()
-            agent.replay()
+            #agent.replay()
             agent.update_target_network()
         #if agent.total_decision > agent.learning_start and not(agent.total_decision%agent.update_target_model_freq) :
-            
 
         if not (e % args.save_rate):
             if not os.path.exists(args.save_dir):
                 os.makedirs(args.save_dir)
             for agent in agents:
                 agent.save_model(args.save_dir)
-        logger.info(f"episode:{e}/{args.episodes}, steps:{i}, average travel time:{env.eng.get_average_travel_time()}")
+        logger.info(f"episode:{e}/{episodes-1}, steps:{i}, average travel time:{env.eng.get_average_travel_time()}")
         for agent_id, agent in enumerate(agents):
-            logger.info(f"agent:{agent_id}, mean_episode_reward:{episodes_rewards[agent_id] / episodes_decision_num[agent_id]}")
+            logger.info(f"agent:{agent_id}, epsilon:{agent.epsilon}, mean_episode_reward:{episodes_rewards[agent_id] / episodes_decision_num[agent_id]}")
+    logger.info("Parametros Utilizados")
+    agent = agents[0]
+    #logger.info(f"BUFFER: buffer_size:{agent.buffer_size}; batch_size:{agent.batch_size}; learning_start:{agent.learning_start};")
+    #logger.info(f"MODEL UPDATE: update_model_freq:{agent.update_model_freq}; update_target_model_freq:{agent.update_target_model_freq};")
+    #logger.info(f"LEARNING: gamma:{agent.gamma}; epsilon:{agent.epsilon_start}; epsilon_min:{agent.epsilon_min}; epsilon_decay:{agent.epsilon_decay}; learning_rate:{agent.learning_rate};")
+    logger.info(f"PHASE: n_phases:{agent.n_phases}; start_phase:{agent.start_phase};")
+    logger.info(f"TRAINING: total_decision:{agent.total_decision};")
+    #logger.info(f"ACTIVATION: activation:{agent.activation};")
+    logger.info(f"STATE: ob_generator:{agent.ob_generator.fns[0]};")
+    logger.info(f"REWARD: reward_generator:{agent.reward_generator.fns[0]};")
+    logger.info(str(info_file))
+
 
 def test():
     obs = env.reset()
