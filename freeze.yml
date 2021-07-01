@@ -1,4 +1,4 @@
-name: rl2
+name: rl
 channels:
   - conda-forge
   - defaults
@@ -156,5 +156,5 @@ dependencies:
     - wcwidth==0.2.5
     - webencodings==0.5.1
     - widgetsnbextension==3.5.1
-prefix: /home/schreiber/anaconda3/envs/rl2
+prefix: /home/schreiber/anaconda3/envs/rl
 
