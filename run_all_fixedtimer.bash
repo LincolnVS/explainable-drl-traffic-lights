@@ -1,7 +1,7 @@
 #!/bin/bash
 
 file_name="log/fixedtime/real1x1.log"
-dataset_name="datasets/real_1x1/config.json"
+dataset_name="datasets/real_1x1/config_4p.json"
 
 min_time=1
 max_time=60

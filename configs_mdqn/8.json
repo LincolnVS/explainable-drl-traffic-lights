@@ -5,7 +5,7 @@
     "learning_start":2000,
     "update_model_freq":100,
     "update_target_model_freq":1,
-    "gamma":0.5,
+    "gamma":0.3,
     "epsilon_start":1,
     "epsilon_min":0.01,
     "epsilon_decay":0.975,

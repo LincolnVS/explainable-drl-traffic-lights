@@ -1,3 +1,6 @@
+import warnings
+warnings.filterwarnings("ignore", message=r"Passing", category=FutureWarning)
+
 import gym
 from environment import TSCEnv
 from world import World
