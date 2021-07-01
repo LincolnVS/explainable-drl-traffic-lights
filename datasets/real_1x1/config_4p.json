@@ -1,7 +1,7 @@
 {       
 	"interval": 1.0,
 	"seed": 1,
-	"dir": "/mnt/d/trabalhoso/tlc-baselines/datasets/real_1x1/data-hangzhou_1x1_bc-tyc_18041608_1_4p/",
+	"dir": "/home/schreiber/mestrado/tlc-baselines/datasets/real_1x1/data-hangzhou_1x1_bc-tyc_18041608_1_4p/",
 	"roadnetFile": "roadnet.json",
 	"flowFile": "flow.json",
 	"rlTrafficLight": true,
