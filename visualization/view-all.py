@@ -135,54 +135,56 @@ def get_infos_log(path):
             att = float(sub_line[-1].split(":")[-1][:])
             steps_to_end.append(steps)
             average_travel_time.append(att)
-        #if("mean_episode_reward" in sub_line[-1]):
-            #print('mean')
+        if("mean_episode_reward" in sub_line[-1]):
+            reward = float(sub_line[-1].split(":")[-1][:])
+            mean_episode_reward.append(reward)
 
     f.close()
     
-    return average_travel_time,steps_to_end
+    return average_travel_time,mean_episode_reward
 
 in_path = Path(args.log_to_view)
 
 if in_path.is_dir():
-    *_, last = Path(in_path).glob('**/*.log')
-    print(last)
+    all = Path(in_path).glob('**/*.log')
 else:
-    last = in_path
+    all = in_path
 
-in_path = last
-dir_path = in_path.parent
+for last in all:
+    print(last)
+    in_path = last
+    dir_path = in_path.parent
 
-out_path = f"{Path(__file__).resolve().parent}/{args.save_dir}_{in_path.stem}"
+    out_path = f"{Path(__file__).resolve().parent}/{args.save_dir}_{in_path.stem}"
 
-Path(out_path).mkdir(parents=True, exist_ok=True)
-in_path.copy(f"{out_path}/{in_path.name}")
+    Path(out_path).mkdir(parents=True, exist_ok=True)
+    in_path.copy(f"{out_path}/{in_path.name}")
 
 
-average_time_travel = []
-total_time = []
+    average_time_travel = []
+    total_time = []
 
-att, steps = get_infos_log(in_path)
-average_time_travel.append(att)
-total_time.append(steps)
+    att, steps = get_infos_log(in_path)
+    average_time_travel.append(att)
+    total_time.append(steps)
 
-min_att,mean_att,max_att = [],[],[]
-min_tt,mean_tt,max_tt = [],[],[]
+    min_att,mean_att,max_att = [],[],[]
+    min_tt,mean_tt,max_tt = [],[],[]
 
-average_time_travel = pd.DataFrame(average_time_travel)
-total_times = pd.DataFrame(total_time)
+    average_time_travel = pd.DataFrame(average_time_travel)
+    total_times = pd.DataFrame(total_time)
 
-for a in range(len(average_time_travel.iloc[0])):
-    min_att.append(np.mean(average_time_travel[a]) - np.std(average_time_travel[a]))
-    mean_att.append(np.mean(average_time_travel[a]))
-    max_att.append(np.mean(average_time_travel[a]) + np.std(average_time_travel[a]))
+    for a in range(len(average_time_travel.iloc[0])):
+        min_att.append(np.mean(average_time_travel[a]) - np.std(average_time_travel[a]))
+        mean_att.append(np.mean(average_time_travel[a]))
+        max_att.append(np.mean(average_time_travel[a]) + np.std(average_time_travel[a]))
 
-    min_tt.append(np.mean(total_times[a]) - np.std(total_times[a]))
-    mean_tt.append(np.mean(total_times[a]))
-    max_tt.append(np.mean(total_times[a]) + np.std(total_times[a]))
+        min_tt.append(np.mean(total_times[a]) - np.std(total_times[a]))
+        mean_tt.append(np.mean(total_times[a]))
+        max_tt.append(np.mean(total_times[a]) + np.std(total_times[a]))
 
-save_values(f"{out_path}/tt",[min_tt,mean_tt,max_tt])
-save_values(f"{out_path}/att",[min_att,mean_att,max_att])
+    save_values(f"{out_path}/tt",[min_tt,mean_tt,max_tt])
+    save_values(f"{out_path}/att",[min_att,mean_att,max_att])
 
-plots_features_and_area(out_path,"time_travel","",max_att,mean_att,min_att, xlabel = 'step',ylabel ='seconds')
-plots_features_and_area(out_path,"reward","",max_tt,mean_tt,min_tt, xlabel = 'step',ylabel ='seconds')
+    plots_features_and_area(out_path,"time_travel","",max_att,mean_att,min_att, xlabel = 'step',ylabel ='seconds')
+    plots_features_and_area(out_path,"reward","",max_tt,mean_tt,min_tt, xlabel = 'step',ylabel ='seconds')
