@@ -3,7 +3,7 @@
 file_name="log/my_dqn_run.log"
 
 info_file="configs_mdqn/"
-dataset_name="datasets/real_1x1/config_4p.json"
+dataset_name="datasets/real_1x1/config_cluster.json"
 
 min_test=1
 max_test=20
