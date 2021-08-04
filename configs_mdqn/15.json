@@ -19,5 +19,5 @@
     "flag_default_reward" : true,
     "flag_mean_reward" : true,
     "flag_arg_episode": false,
-    "episodes": 200
+    "episodes": 2000
  }

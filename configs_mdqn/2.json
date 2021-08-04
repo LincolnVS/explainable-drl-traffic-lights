@@ -1,6 +1,6 @@
 {
     "validation": true,
-    "batch_size":100,
+    "batch_size":2000,
     "buffer_size":30,
     "learning_start":3000,
     "update_model_freq":16,

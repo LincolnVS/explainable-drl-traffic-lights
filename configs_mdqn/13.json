@@ -17,7 +17,7 @@
     "offset_phase_train" : 1,
     "offset_phase" : 1,
     "flag_default_reward" : true,
-    "flag_mean_reward" : true,
+    "flag_mean_reward" : false,
     "flag_arg_episode": false,
     "episodes": 200
  }

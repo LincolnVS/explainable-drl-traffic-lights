@@ -6,7 +6,7 @@
     "update_model_freq":16,
     "update_target_model_freq":1,
     "gamma":0.7,
-    "epsilon_start":1,
+    "epsilon_start":0.1,
     "epsilon_min":0.01,
     "epsilon_decay":0.975,
     "decay_type":"exp",

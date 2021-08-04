@@ -3,7 +3,7 @@
     "batch_size":100,
     "buffer_size":30,
     "learning_start":3000,
-    "update_model_freq":16,
+    "update_model_freq":4,
     "update_target_model_freq":1,
     "gamma":0.7,
     "epsilon_start":1,

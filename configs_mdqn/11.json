@@ -12,7 +12,7 @@
     "decay_type":"exp",
     "learning_rate_model":0.001,
     "epochs_first_replay":3000,
-    "epochs_replay":1,
+    "epochs_replay":2,
     "activation":"linear",
     "offset_phase_train" : 1,
     "offset_phase" : 1,
