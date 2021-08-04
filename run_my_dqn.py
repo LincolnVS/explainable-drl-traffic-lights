@@ -90,7 +90,7 @@ def train(args, env):
 
         for agent in agents: agent.reset_episode_infos()
 
-        first_obs = np.array(env.reset())
+        first_obs = np.array(env.reset())*0.01
         current_obs = first_obs
 
         if e % args.save_rate == args.save_rate - 1:
@@ -108,7 +108,6 @@ def train(args, env):
             ### Requsita nova ação (phase + time) quando acaba o tempo da ação atual
             for agent_id, agent in enumerate(agents):
                 agent_obs = current_obs[agent_id]
-
                 if agent.episode_action_time <= i:
                     if agent.episode_action_time == i:
                         agent.change_phase()
@@ -119,6 +118,7 @@ def train(args, env):
                         #print(first_obs[agent_id], agent_obs)
                         #print("----")
                         first_obs[agent_id] = agent_obs
+                        
                         time = agent.get_action(first_obs[agent_id])
                         agent.action_time = time
                         agent.episode_action_time += 10 + time*2 ## Parte de 15 segundos +  tempo decidido pelo modelo (15,17,19,21,23...)
@@ -129,7 +129,7 @@ def train(args, env):
             for _ in range(args.action_interval):
                 actions = [agent.get_phase() for agent in agents]
                 current_obs, current_rewards, dones, current_info = env.step(actions)
-                current_obs = np.array(current_obs)
+                current_obs = np.array(current_obs)*0.01
                 i += 1
                 
                 #u.append_new_line_states(file_name+"_0",[e,i,first_obs,current_obs,[agents[0].get_phase(),agents[0].I.current_phase],[current_rewards[0],agents[0].real_reward(first_obs[0],current_obs[0])]])
@@ -138,14 +138,17 @@ def train(args, env):
 
 
                     reward = agent.real_reward(first_obs[agent_id],current_obs[agent_id])
-                    
+                    #print(reward,current_rewards[agent_id])
+
                     agent.current_reward.append(current_rewards[agent_id]) if flag_default_reward else agent.current_reward.append(reward) 
 
                     if agent.episode_action_time+yellow_phase_time+offset_phase == i:
                         action_time = agent.action_time
 
                         agent_reward = np.mean(agent.current_reward) if flag_mean_reward else agent.current_reward[-yellow_phase_time]
-
+                        #print('----------------')
+                        #print("Reward: ", agent_reward,"; min:",np.min(agent.current_reward),"; Méd:",np.mean(agent.current_reward),"; Max:",np.max(agent.current_reward),"; Contagem:",len(agent.current_reward) )
+                        #print('----------------')
                         agent.current_reward = []
 
                         phase = agent.actual_phase

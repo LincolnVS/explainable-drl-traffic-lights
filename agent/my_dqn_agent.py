@@ -106,10 +106,11 @@ class DQNAgent(RLAgent):
         reward = np.subtract(first_obs,current_obs)
         weights = [1.5,1.5,1]#[2,1.5,1]
         reward =  np.multiply(reward,weights)
-        return np.round(np.sum(reward),3)
+        return np.round(np.sum(reward),3)*0.01
+        #return -self.get_pressures_reward()/100
 
     def get_reward(self,last_pressure=0):
-        pressures = self.get_pressures_reward()/100
+        pressures = self.get_pressures_reward()*0.005
 
         #print(wait)
         return -1*pressures
@@ -119,12 +120,12 @@ class DQNAgent(RLAgent):
 
         if self.total_decision < self.learning_start:
 
-            #value = 5*round(self.total_decision/200)
-            #if value > self.action_space.n:
-            #    value = random.choice([0,5,10,15,20,25])
-            #value = np.floor(self.total_decision/self.random_coefficient).astype(int)
-            #return self.random_list_values[value]
-            return self.sample()
+            value = 5*round(self.total_decision/200)
+            if value > self.action_space.n:
+                value = random.choice([0,5,10,15,20,25])
+            value = np.floor(self.total_decision/self.random_coefficient).astype(int)
+            return self.random_list_values[value]
+            #return self.sample()
 
         else:
             if np.random.rand() <= self.epsilon:
@@ -211,8 +212,8 @@ class DQNAgent(RLAgent):
             delta = rewards + self.gamma * np.max(q2, axis=1)
             targets = self.model.predict(obs)
 
-        print('\n--------------------')
-        print(obs[0],actions[0],rewards[0],next_obs[0],delta[0],targets[0][actions[0]])
+        #print('\n--------------------')
+        #print(obs[0],actions[0],rewards[0],next_obs[0],delta[0],targets[0][actions[0]])
         
         n_obs = []
         dict_obs = {}

@@ -67,21 +67,18 @@ class DQNAgent(RLAgent):
         minibatch = random.sample(self.memory, self.batch_size)
         obs, actions, rewards, next_obs = [np.stack(x) for x in np.array(minibatch).T]
 
-        target_values_predict = np.amax(self.target_model.predict(next_obs), axis=1)
-        print(rewards[0], target_values_predict[0])
+        #target_values_predict = np.amax(self.target_model.predict(next_obs), axis=1)
+        #print(rewards[0], target_values_predict[0])
 
-        target = rewards + self.gamma * target_values_predict
+        #target = rewards + self.gamma * target_values_predict
+        #target_f = self.model.predict(obs)
+
+        target = rewards + self.gamma * np.amax(self.target_model.predict(next_obs), axis=1)
+        
         target_f = self.model.predict(obs)
-
 
         for i, action in enumerate(actions):
             target_f[i][action] = target[i]
-
-        Q(s,a) <- R(s,a) + gamma * max(Q(n_s,a))
-
-        Q(s,a) <- R(s,a) + gamma * max(Q(n_s,a)) -  Q(s,a)
-        Q(s,a) <- R(s,a) + gamma * max(Q(n_s,a)) -  Q(s,a)
-
 
         history = self.model.fit(obs, target_f, epochs=1, verbose=0)
         #print(history.history['loss'])
@@ -97,3 +94,5 @@ class DQNAgent(RLAgent):
         name = "dqn_agent_{}.h5".format(self.iid)
         model_name = os.path.join(dir, name)
         self.model.save_weights(model_name)
+    
+    

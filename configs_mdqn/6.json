@@ -1,11 +1,11 @@
 {
     "validation": true,
-    "batch_size":2000,
+    "batch_size":100,
     "buffer_size":30,
     "learning_start":3000,
     "update_model_freq":16,
     "update_target_model_freq":1,
-    "gamma":0.5,
+    "gamma":0.7,
     "epsilon_start":1,
     "epsilon_min":0.01,
     "epsilon_decay":0.975,
@@ -16,8 +16,8 @@
     "activation":"linear",
     "offset_phase_train" : 1,
     "offset_phase" : 1,
-    "flag_default_reward" : false,
-    "flag_mean_reward" : false,
+    "flag_default_reward" : true,
+    "flag_mean_reward" : true,
     "flag_arg_episode": false,
     "episodes": 200
  }
