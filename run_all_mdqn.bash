@@ -6,7 +6,7 @@ info_file="configs_mdqn/"
 dataset_name="datasets/real_1x1/config_cluster.json"
 
 min_test=1
-max_test=20
+max_test=30
 
 echo "...Starting all mydqn..." | tee $file_name
 for i in $(seq $min_test $max_test)
