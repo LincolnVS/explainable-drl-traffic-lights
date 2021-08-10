@@ -4,7 +4,7 @@ class MaxPressureAgent(BaseAgent):
     """
     Agent using Max-Pressure method to control traffic light
     """
-    def __init__(self, action_space, I, world, ob_generator=None):
+    def __init__(self, action_space,options, I, world, ob_generator=None):
         super().__init__(action_space)
         self.I = I
         self.world = world
@@ -12,7 +12,7 @@ class MaxPressureAgent(BaseAgent):
         self.ob_generator = ob_generator
         
         # the minimum duration of time of one phase
-        self.t_min = 20
+        self.t_min = options['delta_t']
 
     def get_ob(self):
         if self.ob_generator is not None:

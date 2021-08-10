@@ -5,11 +5,12 @@ class SOTLAgent(BaseAgent):
     """
     Agent using Self-organizing Traffic Light(SOTL) Control method to control traffic light
     """
-    def __init__(self, action_space,options, I, world):
+    def __init__(self, action_space,options, I, world,ob_generator=None):
         super().__init__(action_space)
         self.I = I
         self.world = world
         self.world.subscribe("lane_waiting_count")
+        self.ob_generator = ob_generator
 
         # the minimum duration of time of one phase
         self.t_min = options['green_time']
@@ -20,7 +21,10 @@ class SOTLAgent(BaseAgent):
         self.max_red_vehicle = options['red_v']
 
     def get_ob(self):
-        return None
+        if self.ob_generator is not None:
+            return self.ob_generator.generate() 
+        else:
+            return None
 
     def get_action(self, ob):
         lane_waiting_count = self.world.get_info("lane_waiting_count")
