@@ -41,10 +41,14 @@ class FourierBasis:
         return len(self.coeff)
 
 class TOSFB(RLAgent):
-    def __init__(self, action_space, ob_generator, reward_generator, intersection, yellow_phase_time):
+    def __init__(self, action_space, ob_generator, reward_generator, yellow_phase_time, intersection, world):
         super().__init__(action_space, ob_generator, reward_generator)
 
         self.intersection = intersection
+        self.iid = intersection.id
+        
+        self.world = world
+        self.world.subscribe("pressure")
 
         self.state_dim = ob_generator.ob_shape[0]
         self.learning_start = 0
@@ -111,6 +115,10 @@ class TOSFB(RLAgent):
     def get_action(self, obs):
         features = self.get_features(obs)
         return self.act(features)
+
+    def get_reward(self):
+        reward = self.world.get_info("pressure")[self.iid]*0.005
+        return -1*reward
 
     def act(self, features):
         if np.random.rand() < self.epsilon:

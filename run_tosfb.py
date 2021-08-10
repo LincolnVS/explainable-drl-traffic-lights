@@ -50,8 +50,9 @@ for i in world.intersections:
         action_space,
         StateOfThreeGenerator(world, i, ["state_of_three"], in_only=True, average=None),
         LaneVehicleGenerator(world, i, ["lane_waiting_count"], in_only=True, average="all", negative=True),
+        yellow_phase_time,
         i,
-        yellow_phase_time
+        world
     ))
     if args.load_model:
         agents[-1].load_model(args.save_dir)
@@ -86,7 +87,6 @@ def train(args, env):
             for agent_id, agent in enumerate(agents):
                 if agent.times_skiped == agent.real_time:
                     agent.change_phase()
-                    #replay?
                     pass
 
                 if agent.times_skiped == agent.real_time+agent.yellow_phase_time+1 :
@@ -105,6 +105,7 @@ def train(args, env):
             #Pega fase para ser considerado ação 
             actions = [agent.phase for agent in agents]
             obs, step_rewards, dones, _ = env.step(actions)
+            obs = np.array(obs)*0.01
             i += 1
 
             for agent_id, agent in enumerate(agents):
