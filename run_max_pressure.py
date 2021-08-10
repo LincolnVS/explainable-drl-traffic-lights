@@ -9,8 +9,8 @@ import argparse
 parser = argparse.ArgumentParser(description='Run Example')
 parser.add_argument('config_file', type=str, help='path of config file')
 parser.add_argument('--thread', type=int, default=1, help='number of threads')
-parser.add_argument('--steps', type=int, default=5000, help='number of steps')
-parser.add_argument('--delta_t', type=int, default=20, help='how often agent make decisions')
+parser.add_argument('--steps', type=int, default=3600, help='number of steps')
+parser.add_argument('--delta_t', type=int, default=10, help='how often agent make decisions')
 args = parser.parse_args()
 
 # create world
@@ -34,16 +34,26 @@ env = TSCEnv(world, agents, metric)
 # simulate
 obs = env.reset()
 actions = []
-for i in range(args.steps):
+i = 0
+
+while i < args.steps:
     actions = []
     
     for agent_id, agent in enumerate(agents):
         actions.append(agent.get_action(obs[agent_id]))
-    obs, rewards, dones, info = env.step(actions)
-    #print(world.intersections[0]._current_phase, end=",")
-    #print(obs, actions)
-    for ind_m in range(len(env.metric)):
-        env.metric[ind_m].update(done=False)
+
+    for _ in range(args.delta_t):  
+        obs, rewards, dones, info = env.step(actions)
+        #print(world.intersections[0]._current_phase, end=",")
+        #print(obs, actions)
+        for ind_m in range(len(env.metric)):
+            env.metric[ind_m].update(done=False)
+        
+        i += 1
+
+    if all(dones) == True:
+        print(i)
+        break
 
 for ind_m in range(len(metric_name)):
     print("{} is {:.4f}".format(metric_name[ind_m], env.metric[ind_m].update(done=True)))
