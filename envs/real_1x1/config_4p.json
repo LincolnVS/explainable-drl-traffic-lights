@@ -1,0 +1,11 @@
+{       
+	"interval": 1.0,
+	"seed": 1,
+	"dir": "/mnt/d/trabalhoso/tlc-baselines/envs/real_1x1/data-hangzhou_1x1_bc-tyc_18041608_1_4p/",
+	"roadnetFile": "roadnet.json",
+	"flowFile": "flow.json",
+	"rlTrafficLight": true,
+	"saveReplay": true,
+	"roadnetLogFile": "roadnetlog.json",
+	"replayLogFile": "replay.txt"
+}
