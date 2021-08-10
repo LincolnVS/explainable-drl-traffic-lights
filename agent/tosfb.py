@@ -41,10 +41,10 @@ class FourierBasis:
         return len(self.coeff)
 
 class TOSFB(RLAgent):
-    def __init__(self, action_space, ob_generator, reward_generator, iid, world):
+    def __init__(self, action_space, ob_generator, reward_generator, intersection, yellow_phase_time):
         super().__init__(action_space, ob_generator, reward_generator)
 
-        self.iid = iid
+        self.intersection = intersection
 
         self.state_dim = ob_generator.ob_shape[0]
         self.learning_start = 0
@@ -73,6 +73,29 @@ class TOSFB(RLAgent):
 
         self.q_old = None
         self.action = None
+
+        #Phase Vars:
+        self.n_phases = len(self.intersection.phases)
+        self.start_phase = 0
+        
+        #Simulation Vars:
+        self.action_time = 0 #Tempo escolhido pelo agente
+        self.real_time = 0 #Tempo real (10+action_time*2)
+        self.times_skiped = 0 #Quantidade de vezes que já estamos esperando
+        self.obs = [] #Informação do estado
+        self.reward = [] #Informação de recompesa
+        self.phase = 0 #Fase atual
+        self.yellow_phase_time = yellow_phase_time #Tempo de amarelo do cruzamento
+
+    def next_phase(self,phase):
+        if phase < self.start_phase+self.n_phases-1:
+            return phase + 1
+        else:
+            return self.start_phase
+
+    def change_phase(self):        
+        self.phase = self.next_phase(self.phase)
+
 
     def get_q_value(self, features, action):
         return np.dot(self.theta[action], features)

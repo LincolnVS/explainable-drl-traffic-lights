@@ -39,9 +39,11 @@ logger.addHandler(sh)
 # create world
 world = World(args.config_file, thread_num=args.thread)
 
+
 # create agents
 agents = []
 for i in world.intersections:
+    # define tempo de amarelo
     yellow_phase_time = i.yellow_phase_time
     action_space = gym.spaces.Discrete(len(i.phases))
     agents.append(TOSFB(
@@ -49,7 +51,7 @@ for i in world.intersections:
         StateOfThreeGenerator(world, i, ["state_of_three"], in_only=True, average=None),
         LaneVehicleGenerator(world, i, ["lane_waiting_count"], in_only=True, average="all", negative=True),
         i,
-        world
+        yellow_phase_time
     ))
     if args.load_model:
         agents[-1].load_model(args.save_dir)
@@ -65,45 +67,66 @@ env = TSCEnv(world, agents, metric)
 def train(args, env):
     total_decision_num = 0
     for e in range(args.episodes):
-        last_obs = env.reset()
+        obs = env.reset()
         if e % args.save_rate == args.save_rate - 1:
             env.eng.set_save_replay(True)
             env.eng.set_replay_file("replay_%s.txt" % e)
         else:
             env.eng.set_save_replay(False)
+        
+        for agent_id, agent in enumerate(agents):
+            agent.obs = obs[agent_id]
         episodes_rewards = [0 for i in agents]
         episodes_decision_num = 0
         i = 0
+
         while i < args.steps:
-            if i % args.action_interval == 0:
-                actions = []
-                for agent_id, agent in enumerate(agents):
+
+            #Fazer verificação se é hora de tomar ação
+            for agent_id, agent in enumerate(agents):
+                if agent.times_skiped == agent.real_time:
+                    agent.change_phase()
+                    #replay?
+                    pass
+
+                if agent.times_skiped == agent.real_time+agent.yellow_phase_time+1 :
+                    agent.obs = obs[agent_id]
                     if total_decision_num > agent.learning_start:
-                        actions.append(agent.get_action(last_obs[agent_id]))
+                        agent.action_time = agent.get_action(agent.obs)
                     else:
-                        actions.append(agent.sample())
+                        agent.action_time = agent.sample()
 
-                rewards_list = []
-                for _ in range(args.action_interval):
-                    obs, rewards, dones, _ = env.step(actions)
-                    i += 1
-                    rewards_list.append(rewards)
-                rewards = np.mean(rewards_list, axis=0)
+                    agent.times_skiped = 0
+                    agent.real_time = 10 + agent.action_time*2
+                    agent.reward = []
+                else:
+                    agent.times_skiped += 1
+            
+            #Pega fase para ser considerado ação 
+            actions = [agent.phase for agent in agents]
+            obs, step_rewards, dones, _ = env.step(actions)
+            i += 1
 
-                for agent_id, agent in enumerate(agents):
-                    agent.remember(last_obs[agent_id], actions[agent_id], rewards[agent_id], obs[agent_id])
-                    episodes_rewards[agent_id] += rewards[agent_id]
+            for agent_id, agent in enumerate(agents):
+                
+                agent.reward.append(step_rewards[agent_id])
+
+                if agent.times_skiped >= agent.real_time+agent.yellow_phase_time+1:
+                        
+                    reward = np.mean(agent.reward)
+                    #print(agent.obs, reward, agent.phase, agent.action_time)
+                    agent.remember(agent.obs, agent.action_time, reward, obs[agent_id])
+                    episodes_rewards[agent_id] += reward
                     episodes_decision_num += 1
                     total_decision_num += 1
-                
-                last_obs = obs
+                    
 
             """ for agent_id, agent in enumerate(agents):
                 if total_decision_num > agent.learning_start and total_decision_num % agent.update_model_freq == agent.update_model_freq - 1:
                     agent.replay() """
 
-            if all(dones):
-                break
+            #if all(dones):
+            #    break
         if e % args.save_rate == args.save_rate - 1:
             if not os.path.exists(args.save_dir):
                 os.makedirs(args.save_dir)
