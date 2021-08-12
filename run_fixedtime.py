@@ -4,8 +4,6 @@ from world import World
 from agent import Fixedtime_Agent
 from metric import TravelTimeMetric, ThroughputMetric, SpeedScoreMetric
 
-from datetime import datetime
-import time
 import argparse
 # parse args
 parser = argparse.ArgumentParser(description='Run Example')
@@ -39,7 +37,6 @@ obs = env.reset()
 actions = []
 steps = 0
 
-start_time = time.time()
 #Walk through the steps
 while steps < args.steps:
 
@@ -60,6 +57,3 @@ while steps < args.steps:
 #Print all metrics
 for metric in env.metric:
     print("{} is {:.4f}".format(metric.name, metric.eval()))
-
-
-print("--- %s seconds ---" % (time.time() - start_time))

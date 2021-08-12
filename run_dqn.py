@@ -3,20 +3,19 @@ from environment import TSCEnv
 from world import World
 from generator import LaneVehicleGenerator
 from agent.dqn_agent import DQNAgent
-from metric import TravelTimeMetric
+from metric import TravelTimeMetric, ThroughputMetric, SpeedScoreMetric
 import argparse
 import os
 import numpy as np
 import logging
 from datetime import datetime
-
 # parse args
 parser = argparse.ArgumentParser(description='Run Example')
 parser.add_argument('config_file', type=str, help='path of config file')
 parser.add_argument('--thread', type=int, default=1, help='number of threads')
 parser.add_argument('--steps', type=int, default=3600, help='number of steps')
 parser.add_argument('--action_interval', type=int, default=20, help='how often agent make decisions')
-parser.add_argument('--episodes', type=int, default=200, help='training episodes')
+parser.add_argument('--episodes', type=int, default=60, help='training episodes')
 parser.add_argument('--save_model', action="store_true", default=False)
 parser.add_argument('--load_model', action="store_true", default=False)
 parser.add_argument("--save_rate", type=int, default=20, help="save model once every time this many episodes are completed")
@@ -51,8 +50,9 @@ for i in world.intersections:
     if args.load_model:
         agents[-1].load_model(args.save_dir)
 
-# create metric
-metric = TravelTimeMetric(world)
+
+# Create metric
+metric = [TravelTimeMetric(world), ThroughputMetric(world), SpeedScoreMetric(world)]
 
 # create env
 env = TSCEnv(world, agents, metric)
@@ -61,6 +61,7 @@ env = TSCEnv(world, agents, metric)
 def train(args, env):
     total_decision_num = 0
     for e in range(args.episodes):
+        
         last_obs = env.reset()
         if e % args.save_rate == args.save_rate - 1:
             env.eng.set_save_replay(True)
@@ -107,8 +108,14 @@ def train(args, env):
             for agent in agents:
                 agent.save_model(args.save_dir)
         logger.info("episode:{}/{}, average travel time:{}".format(e, args.episodes, env.eng.get_average_travel_time()))
+            
         for agent_id, agent in enumerate(agents):
             logger.info("agent:{}, mean_episode_reward:{}".format(agent_id, episodes_rewards[agent_id] / episodes_decision_num))
+
+        print("------")
+        
+        for metric in env.metric:
+            print("{} is {:.4f}".format(metric.name, metric.eval()))
 
 def test():
     obs = env.reset()
