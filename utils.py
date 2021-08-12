@@ -3,7 +3,18 @@ import pandas as pd
 import csv
 import os
 import json
-  
+
+import wandb
+#wandb
+def wand_init(project_name='my-test-project',run_name='test'):
+    wandb.init(project=project_name)
+    wandb.run.name = run_name
+    wandb.run.save()
+
+def wand_log(dict):
+    wandb.log(dict)
+
+
 # Opening JSON file
 def get_info_file(file_name):
     try:
