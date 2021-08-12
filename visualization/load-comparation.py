@@ -27,7 +27,7 @@ def create_gif(fp_in,fp_out,file_out):
     from natsort import natsorted
 
     # filepaths
-    fp_in = fp_in+"*.png"
+    fp_in = fp_in+f"{file_out}*.png"
     fp_out = fp_out+f"{file_out}.gif"
 
     # https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html#gif
@@ -187,6 +187,7 @@ if in_path.is_dir():
 else:
     all = in_path
 
+print(all)
 all, all_backup = itertools.tee(all)
 
 
@@ -235,11 +236,16 @@ for i,last in enumerate(all):
     save_values(f"{out_path}/tt",[min_tt,mean_tt,max_tt])
     save_values(f"{out_path}/att",[min_att,mean_att,max_att])
 
-    plots_features_and_area(out_path,"time_travel",in_path.name,max_att,mean_att,min_att, xlabel = 'step',ylabel ='seconds',i=i)
-    #plots_features_and_area(out_path,"reward",in_path.name,max_tt,mean_tt,min_tt, xlabel = 'step',ylabel ='seconds',i)
+    #plots_features_and_area(out_path,"time_travel",in_path.name,max_att,mean_att,min_att, xlabel = 'episodes',ylabel ='seconds',i=i)
+    plots_features_and_area(out_path,"reward",in_path.name,max_tt,mean_tt,min_tt, xlabel = 'episodes',ylabel ='reward',i=i)
 
 if args.fbf:
     try:
         create_gif(f"{out_path}/fbf/",f"{out_path}/","time_travel")
+    except:
+        pass
+    
+    try:
+        create_gif(f"{out_path}/fbf/",f"{out_path}/","reward")
     except:
         pass
