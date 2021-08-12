@@ -50,20 +50,19 @@ class TOSFB(RLAgent):
         self.world = world
         self.world.subscribe("pressure")
 
+        self.action_dim = 26
         self.state_dim = ob_generator.ob_shape[0]
         self.learning_start = 0
 
-        self.gamma = 0.95  # discount rate
-        self.alpha = 0.0001
+        self.gamma = 0.7  # discount rate
+        self.alpha = 0.005 #0.005
         self.lr = self.alpha
         self.lamb = 0.9
-        self.epsilon = 0.1
-        self.epsilon_decay = 0.995
+        self.epsilon = 1.0
+        self.epsilon_decay = 0.9995 #0.9995
         self.min_epsilon = 0.01
-
-        self.action_dim = 26
-        self.fourier_order = 7
-        self.max_non_zero_fourier = 3
+        self.fourier_order = 9 #9
+        self.max_non_zero_fourier = 2
         basis = 'fourier'
 
         if basis == 'fourier':
@@ -77,6 +76,7 @@ class TOSFB(RLAgent):
 
         self.q_old = None
         self.action = None
+        self.td_error = 0
 
         #Phase Vars:
         self.n_phases = len(self.intersection.phases)
@@ -100,7 +100,6 @@ class TOSFB(RLAgent):
     def change_phase(self):        
         self.phase = self.next_phase(self.phase)
 
-
     def get_q_value(self, features, action):
         return np.dot(self.theta[action], features)
         
@@ -122,6 +121,7 @@ class TOSFB(RLAgent):
 
     def act(self, features):
         if np.random.rand() < self.epsilon:
+            #self.reset_traces()
             return self.action_space.sample()
         else:
             q_values = [self.get_q_value(features, a) for a in range(self.action_dim)]
@@ -131,15 +131,18 @@ class TOSFB(RLAgent):
         return self.action_space.sample()
 
     def remember(self, state, action, reward, next_state, done=False):
-        state, next_state = np.array(state), np.array(next_state)
         phi = self.get_features(state)
         next_phi = self.get_features(next_state)
         q = self.get_q_value(phi, action)
         if not done:
+            """ q_values = [self.get_q_value(next_phi, a) for a in range(self.action_dim)]
+            next_q = max(q_values) """
             next_q = self.get_q_value(next_phi, self.act(next_phi))
         else:
             next_q = 0.0
         td_error = reward + self.gamma * next_q - q
+        self.td_error = td_error
+        #print(td_error)
         if self.q_old is None:
             self.q_old = q
 
@@ -156,6 +159,7 @@ class TOSFB(RLAgent):
             self.reset_traces()
         
         self.epsilon = max(self.epsilon_decay*self.epsilon, self.min_epsilon)
+        #print(self.epsilon)
 
     """ def replay(self):
         minibatch = random.sample(self.memory, self.batch_size)

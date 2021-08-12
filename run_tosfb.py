@@ -4,12 +4,14 @@ from world import World
 from generator import LaneVehicleGenerator, StateOfThreeGenerator
 from agent.dqn_agent import DQNAgent
 from agent.tosfb import TOSFB
-from metric import TravelTimeMetric
+from metric import TravelTimeMetric, travel_time
 import argparse
 import os
 import numpy as np
 import logging
 from datetime import datetime
+import wandb
+
 
 # parse args
 parser = argparse.ArgumentParser(description='Run Example')
@@ -17,7 +19,7 @@ parser.add_argument('config_file', type=str, help='path of config file')
 parser.add_argument('--thread', type=int, default=1, help='number of threads')
 parser.add_argument('--steps', type=int, default=3600, help='number of steps')
 parser.add_argument('--action_interval', type=int, default=20, help='how often agent make decisions')
-parser.add_argument('--episodes', type=int, default=200, help='training episodes')
+parser.add_argument('--episodes', type=int, default=2000, help='training episodes')
 parser.add_argument('--save_model', action="store_true", default=False)
 parser.add_argument('--load_model', action="store_true", default=False)
 parser.add_argument("--save_rate", type=int, default=20, help="save model once every time this many episodes are completed")
@@ -58,6 +60,17 @@ for i in world.intersections:
         agents[-1].load_model(args.save_dir)
 
 
+wandb.init(project='Explainability', 
+            name='tosfb', 
+            save_code=True,
+            config={'lr': agents[-1].alpha,
+                    'fourier_order': agents[-1].fourier_order,
+                    'gamma': agents[-1].gamma,
+                    'min_epsilon': agents[-1].min_epsilon,
+                    'lambda': agents[-1].lamb,
+                    'max_nonzero_fourier': agents[-1].max_non_zero_fourier,
+                    'epsilon_decay': agents[-1].epsilon_decay})
+
 # create metric
 metric = TravelTimeMetric(world)
 
@@ -68,6 +81,9 @@ env = TSCEnv(world, agents, metric)
 def train(args, env):
     total_decision_num = 0
     for e in range(args.episodes):
+        for agent in agents:
+            agent.reset_traces()
+
         obs = env.reset()
         if e % args.save_rate == args.save_rate - 1:
             env.eng.set_save_replay(True)
@@ -78,6 +94,7 @@ def train(args, env):
         for agent_id, agent in enumerate(agents):
             agent.obs = obs[agent_id]
         episodes_rewards = [0 for i in agents]
+        td_errors = [0 for i in agents]
         episodes_decision_num = 0
         i = 0
 
@@ -115,9 +132,11 @@ def train(args, env):
                 if agent.times_skiped >= agent.real_time+agent.yellow_phase_time+1:
                         
                     reward = np.mean(agent.reward)
+                    #wandb.log({'reward': reward, 'td-error': agent.td_error, 'action': agent.action_time})
                     #print(agent.obs, reward, agent.phase, agent.action_time)
                     agent.remember(agent.obs, agent.action_time, reward, obs[agent_id])
                     episodes_rewards[agent_id] += reward
+                    td_errors[agent_id] += agent.td_error
                     episodes_decision_num += 1
                     total_decision_num += 1
                     
@@ -133,9 +152,18 @@ def train(args, env):
                 os.makedirs(args.save_dir)
             for agent in agents:
                 agent.save_model(args.save_dir)
-        logger.info("episode:{}/{}, average travel time:{}".format(e, args.episodes, env.eng.get_average_travel_time()))
+        travel_time = env.eng.get_average_travel_time()
+        mean_reward = {}
+        mean_td_error = {}
         for agent_id, agent in enumerate(agents):
-            logger.info("agent:{}, mean_episode_reward:{}".format(agent_id, episodes_rewards[agent_id] / episodes_decision_num))
+            mean_reward[agent_id] = episodes_rewards[agent_id] / episodes_decision_num
+            mean_td_error[agent_id] = td_errors[agent_id] / episodes_decision_num
+        logger.info("episode:{}/{}, average travel time:{}".format(e, args.episodes, travel_time))
+        for agent_id, agent in enumerate(agents):
+            logger.info("agent:{}, mean_episode_reward:{}".format(agent_id, mean_reward[agent_id]))
+            wandb.log({'episode': e, 'avg travel time': travel_time, 'epsilon': agent.epsilon, 'mean_td_error': mean_td_error[agent_id], 'mean_reward': mean_reward[agent_id], 'total_reward': episodes_rewards[agent_id]})
+
+    wandb.run.finish()
 
 def test():
     obs = env.reset()
