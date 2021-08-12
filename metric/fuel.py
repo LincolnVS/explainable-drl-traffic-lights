@@ -3,22 +3,15 @@ import numpy as np
 
 class FuelMetric(BaseMetric):
     """
-    Calculate average travel time of all vehicles.
-    For each vehicle, travel time measures time between it entering and leaving the roadnet.
+    Calculate Average Fuel Cost.
+    
     """
     def __init__(self, world):
         self.world = world
         self.world.subscribe(["vehicles", "time"])
-        self.vehicle_route = {}
-        self.vehicle_fuel = {}
-
-        # calculate road lengths
-        self.road_length = {}
-        for road in self.world.roadnet["roads"]:
-            points = road["points"]
-            self.road_length[road["id"]] = \
-                pow(((points[0]["x"] - points[1]["x"]) **2 + (points[0]["y"] - points[1]["y"]) **2), 0.5)
-
+        self.name= "Average Fuel Cost"
+        self.reset()
+        
     def cal_fuel(self, routes):
         distance = 0
         ratio = 71.294 / (68593.74-0)
@@ -26,7 +19,6 @@ class FuelMetric(BaseMetric):
             distance += self.road_length[road]
 
         return distance * ratio * 2.4
-
 
     def update(self, done=False):
         vehicles = self.world.get_info("vehicles")
@@ -55,4 +47,19 @@ class FuelMetric(BaseMetric):
         if done:
             print("eveluated vehicles:", len(self.vehicle_fuel))
 
+        return self.eval()
+    
+    def eval(self):
         return np.mean(list(self.vehicle_fuel.values())) if len(self.vehicle_fuel) else 0
+
+    def reset(self):
+        self.vehicle_route = {}
+        self.vehicle_fuel = {}
+
+        # calculate road lengths
+        self.road_length = {}
+        for road in self.world.roadnet["roads"]:
+            points = road["points"]
+            self.road_length[road["id"]] = \
+                pow(((points[0]["x"] - points[1]["x"]) **2 + (points[0]["y"] - points[1]["y"]) **2), 0.5)
+

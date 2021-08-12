@@ -181,6 +181,8 @@ class World(object):
             "lane_vehicles": self.eng.get_lane_vehicles,
             "time": self.eng.get_current_time,
             "vehicle_distance": self.eng.get_vehicle_distance,
+            "vehicle_speed":self.eng.get_vehicle_speed,
+            "avg_travel_time":self.eng.get_average_travel_time,
             "pressure": self.get_pressure,
             "lane_waiting_time_count": self.get_lane_waiting_time_count,
             "lane_delay": self.get_lane_delay,
@@ -198,30 +200,6 @@ class World(object):
 
         print("world built.")
 
-    def get_pressure_waiting(self):
-        vehicles = self.eng.get_lane_vehicle_count()
-        pressures = {}
-        for i in self.intersections:
-            pressure = 0
-            in_lanes = []
-            for road in i.in_roads:
-                from_zero = (road["startIntersection"] == i.id) if self.RIGHT else (
-                        road["endIntersection"] == i.id)
-                for n in range(len(road["lanes"]))[::(1 if from_zero else -1)]:
-                    in_lanes.append(road["id"] + "_" + str(n))
-            out_lanes = []
-            for road in i.out_roads:
-                from_zero = (road["endIntersection"] == i.id) if self.RIGHT else (
-                        road["startIntersection"] == i.id)
-                for n in range(len(road["lanes"]))[::(1 if from_zero else -1)]:
-                    out_lanes.append(road["id"] + "_" + str(n))
-            for lane in vehicles.keys():
-                if lane in in_lanes:
-                    pressure += vehicles[lane]
-                if lane in out_lanes:
-                    pressure -= vehicles[lane]
-            pressures[i.id] = pressure
-        return pressures
 
     def get_pressure(self):
         vehicles = self.eng.get_lane_vehicle_count()
@@ -326,8 +304,6 @@ class World(object):
             lane_delay[lane] = 1 - lane_avg_speed / speed_limit
         return lane_delay
 
-
-
     def get_state_of_three(self):
         
         state_of_three = {}
@@ -353,7 +329,6 @@ class World(object):
 
         #print(state_of_three)
         return state_of_three
-
 
     def get_vehicle_trajectory(self):
         # lane_id and time spent on the corresponding lane that each vehicle went through

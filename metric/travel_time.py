@@ -8,25 +8,18 @@ class TravelTimeMetric(BaseMetric):
     """
     def __init__(self, world):
         self.world = world
-        self.world.subscribe(["vehicles", "time"])
-        self.vehicle_enter_time = {}
-        self.travel_times = []
+        self.world.subscribe(["avg_travel_time"])
+        self.name = "Average Travel Time"
+        self.reset()
 
     def update(self, done=False):
-        vehicles = self.world.get_info("vehicles")
-        current_time = self.world.get_info("time")
+        self.travel_time = self.world.get_info("avg_travel_time")
 
-        for vehicle in vehicles:
-            if not vehicle in self.vehicle_enter_time:
-                self.vehicle_enter_time[vehicle] = current_time
+        return self.eval()
 
-        for vehicle in list(self.vehicle_enter_time):
-            if done or not vehicle in vehicles:
-                self.travel_times.append(current_time - self.vehicle_enter_time[vehicle])
-                del self.vehicle_enter_time[vehicle]
+    def eval(self):
+        return self.travel_time
 
-        if done:
-            print("eveluated vehicles:", len(self.travel_times))
-            
-        
-        return np.mean(self.travel_times) if len(self.travel_times) else 0
+    def reset(self):
+        #self.vehicle_enter_time = {}
+        self.travel_time = []
