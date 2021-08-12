@@ -9,4 +9,5 @@ model/*
 log/*
 
 visualization/out*
-datasets/*/*/*.txt
+envs/*/*/*.txt
+wandb/*

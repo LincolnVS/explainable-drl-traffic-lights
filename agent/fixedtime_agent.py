@@ -3,25 +3,28 @@ import math
 
 
 class Fixedtime_Agent(BaseAgent):
-    def __init__(self, action_space,phase_time, iid):
+    def __init__(self, action_space,options, I, world, ob_generator=None):
         super().__init__(action_space)
-        self.iid = iid
-        self.last_action = 0
-        self.last_action_time = 0
+        self.I = I
+        self.world = world
+        self.ob_generator = ob_generator
 
-        self.phase_time = phase_time
+        self.action = 0
+
+        self.phase_time = options['phase_time']
 
     def get_ob(self):
-        return 0
+        if self.ob_generator is not None:
+            return self.ob_generator.generate() 
+        else:
+            return None
 
     def get_reward(self):
-        return 0
+        return None
 
     def get_action(self, world):
-        current_time = world.eng.get_current_time()
 
-        if current_time - self.last_action_time >= self.phase_time:
-            self.last_action = (self.last_action + 1) % self.action_space.n
-            self.last_action_time = current_time
-        
-        return self.last_action
+        if self.I.current_phase_time >= self.phase_time:
+            self.action = (self.action + 1) % self.action_space.n
+
+        return self.action

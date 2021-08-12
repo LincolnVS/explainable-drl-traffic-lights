@@ -38,7 +38,7 @@ class TSCEnv(gym.Env):
         obs = [agent.get_ob() for agent in self.agents]
         rewards = [agent.get_reward() for agent in self.agents]
         
-        if self.world.count_vehicles() == 0:
+        if self.world.count_vehicles() == 0 and self.world.eng.get_current_time() > 20:
             dones = [True] * self.n_agents
         else:
             dones = [False] * self.n_agents

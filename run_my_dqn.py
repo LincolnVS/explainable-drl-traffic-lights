@@ -25,7 +25,7 @@ parser.add_argument('--load_model', action="store_true", default=False)
 parser.add_argument("--save_rate", type=int, default=20, help="save model once every time this many episodes are completed")
 parser.add_argument('--save_dir', type=str, default="model/my_dqn", help='directory in which model should be saved')
 parser.add_argument('--log_dir', type=str, default="log/my_dqn", help='directory in which logs should be saved')
-parser.add_argument('--info_file', type=str, default="configs_mdqn/default.json", help='path to the file with informations about the model')
+parser.add_argument('--info_file', type=str, default="agent/configs_mdqn/default.json", help='path to the file with informations about the model')
 args = parser.parse_args()
 
 if not os.path.exists(args.log_dir):

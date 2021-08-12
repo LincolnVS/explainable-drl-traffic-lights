@@ -2,8 +2,8 @@
 
 file_name="log/my_dqn_run.log"
 
-info_file="configs_mdqn/"
-dataset_name="datasets/real_1x1/config_cluster.json"
+info_file="agent/configs_mdqn/"
+dataset_name="envs/real_1x1/config_cluster.json"
 
 min_test=1
 max_test=30
@@ -17,3 +17,4 @@ do
 done   
 
 python visualization/view-all.py "log/my_dqn/" | tee -a $file_name
+
