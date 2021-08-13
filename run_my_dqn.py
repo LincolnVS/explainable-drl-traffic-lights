@@ -6,7 +6,7 @@ from environment import TSCEnv
 from world import World
 from generator import LaneVehicleGenerator, StateOfThreeGenerator
 from agent.my_dqn_agent import DQNAgent
-from metric import TravelTimeMetric
+from metric import TravelTimeMetric, ThroughputMetric, SpeedScoreMetric
 import argparse
 import os
 import numpy as np
@@ -31,7 +31,8 @@ args = parser.parse_args()
 if not os.path.exists(args.log_dir):
     os.makedirs(args.log_dir)
 
-file_name = f"{args.log_dir}/{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+file_name_time = f"{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+file_name = f"{args.log_dir}/{file_name_time}"
 logger = logging.getLogger('main')
 logger.setLevel(logging.DEBUG)
 fh = logging.FileHandler(file_name + ".log")
@@ -49,6 +50,9 @@ flag_default_reward = info_file['flag_default_reward']
 flag_mean_reward = info_file['flag_mean_reward']
 
 episodes = args.episodes if info_file['flag_arg_episode'] else info_file['episodes']
+
+#start wandb
+u.wand_init("my_dqn",f'dqn_{file_name_time}')
 
 # create world
 world = World(args.config_file, thread_num=args.thread)
@@ -75,8 +79,9 @@ for i in world.intersections:
 
 
 print(i.phases)
-# create metric
-metric = TravelTimeMetric(world)
+
+# Create metric
+metric = [TravelTimeMetric(world), ThroughputMetric(world), SpeedScoreMetric(world)]
 
 # create env
 env = TSCEnv(world, agents, metric)
@@ -173,9 +178,25 @@ def train(args, env):
                 os.makedirs(args.save_dir)
             for agent in agents:
                 agent.save_model(args.save_dir)
-        logger.info(f"episode:{e}/{episodes-1}, steps:{i}, average travel time:{env.eng.get_average_travel_time()}")
+                
+        eval_dict = {}
+
+        logger.info(f"episode:{e}/{episodes-1}, steps:{i}")
+        eval_dict["episode"]=e
+        eval_dict["steps"]=i
+
+        for metric in env.metric:
+            logger.info(f"{metric.name}: {metric.eval()}")
+            eval_dict[metric.name]=metric.eval()
+
         for agent_id, agent in enumerate(agents):
             logger.info(f"agent:{agent_id}, epsilon:{agent.epsilon}, mean_episode_reward:{episodes_rewards[agent_id] / episodes_decision_num[agent_id]}")
+
+        eval_dict["epsilon"]=agents[0].epsilon
+        eval_dict["mean_episode_reward"]=episodes_rewards[0] / episodes_decision_num[0]
+        
+        u.wand_log(eval_dict)
+
     logger.info("Parametros Utilizados")
     agent = agents[0]
     #logger.info(f"BUFFER: buffer_size:{agent.buffer_size}; batch_size:{agent.batch_size}; learning_start:{agent.learning_start};")
