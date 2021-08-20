@@ -7,7 +7,7 @@ import json
 import wandb
 #wandb
 def wand_init(project_name='my-test-project',name=None,group=None):
-    wandb.init(project=project_name,name=run_name,group=group)
+    wandb.init(project=project_name,name=name,group=group)
 
 def wand_log(dict):
     wandb.log(dict)
