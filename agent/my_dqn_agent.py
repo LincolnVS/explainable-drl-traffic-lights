@@ -73,7 +73,8 @@ class DQNAgent(RLAgent):
         self.episode_action_time = 0
         self.action_time = 0
 
-        self.random_list_values = [0,5,10,15,20,25]
+        last = action_space.n
+        self.random_list_values = list(range(0,last,int(last/6)))
         self.random_coefficient = (self.learning_start+1)/len(self.random_list_values)
 
     def get_phase(self):
@@ -122,7 +123,7 @@ class DQNAgent(RLAgent):
 
             value = 5*round(self.total_decision/200)
             if value > self.action_space.n:
-                value = random.choice([0,5,10,15,20,25])
+                value = random.choice(self.random_list_values)
             value = np.floor(self.total_decision/self.random_coefficient).astype(int)
             return self.random_list_values[value]
             #return self.sample()
