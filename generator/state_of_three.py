@@ -37,7 +37,7 @@ class StateOfThreeGenerator(BaseGenerator):
 
         # calculate result dimensions
         #size = sum(len(x) for x in self.lanes)
-        size = 3
+        self.ob_length = 3#len(self.ob_shape) 
 
         self.ob_shape = np.array([0,0,0]).shape
 
@@ -57,7 +57,7 @@ class StateOfThreeGenerator(BaseGenerator):
 if __name__ == "__main__":
     from world import World
     world = World("examples/config.json", thread_num=1)
-    laneVehicle = LaneVehicleGenerator(world, world.intersections[0], ["count"], False, "road")
+    laneVehicle = StateOfThreeGenerator(world, world.intersections[0], ["count"], False, "road")
     for _ in range(100):
         world.step()
     print(laneVehicle.generate())

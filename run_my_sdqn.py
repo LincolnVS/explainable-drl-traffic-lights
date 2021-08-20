@@ -23,9 +23,9 @@ parser.add_argument('--episodes', type=int, default=200, help='training episodes
 parser.add_argument('--save_model', action="store_true", default=False)
 parser.add_argument('--load_model', action="store_true", default=False)
 parser.add_argument("--save_rate", type=int, default=20, help="save model once every time this many episodes are completed")
-parser.add_argument('--save_dir', type=str, default="model/my_dqn", help='directory in which model should be saved')
-parser.add_argument('--log_dir', type=str, default="log/my_dqn", help='directory in which logs should be saved')
-parser.add_argument('--info_file', type=str, default="agent/configs_mdqn/default.json", help='path to the file with informations about the model')
+parser.add_argument('--save_dir', type=str, default="model/my_sdqn", help='directory in which model should be saved')
+parser.add_argument('--log_dir', type=str, default="log/my_sdqn", help='directory in which logs should be saved')
+parser.add_argument('--info_file', type=str, default="agent/configs_sdqn/default.json", help='path to the file with informations about the model')
 args = parser.parse_args()
 
 if not os.path.exists(args.log_dir):
@@ -52,7 +52,7 @@ flag_mean_reward = info_file['flag_mean_reward']
 episodes = args.episodes if info_file['flag_arg_episode'] else info_file['episodes']
 
 #start wandb
-u.wand_init("my_dqn",f'dqn_{file_name_time}')
+u.wand_init("my_sdqn",f'sdqn_{file_name_time}')
 
 # create world
 world = World(args.config_file, thread_num=args.thread)
@@ -63,7 +63,7 @@ yellow_phase_time = 0
 agents = []
 for i in world.intersections:
     yellow_phase_time = i.yellow_phase_time
-    action_space = gym.spaces.Discrete(26)
+    action_space = gym.spaces.Discrete(11)
     agents.append(DQNAgent(
         action_space,
         StateOfThreeGenerator(world, i, ["state_of_three"], in_only=True, average=None),
@@ -116,19 +116,34 @@ def train(args, env):
                 if agent.episode_action_time <= i:
                     if agent.episode_action_time == i:
                         agent.change_phase()
+                        
+                        initial_phase = agent.actual_phase
+                        a_phase = initial_phase
+                        obs_te = env.world.get_state_of_three_by_phase(agent.I,a_phase)
+                        while obs_te[0] == 0:
+                            agent.change_phase() 
+                            a_phase = agent.actual_phase
+                            obs_te = env.world.get_state_of_three_by_phase(agent.I,a_phase)
+                            if initial_phase == a_phase:
+                                break
+
+                        
                         agent.replay() 
                         #agent.action_time = -1
+                        #print(i,agent.get_phase())
 
-                    if agent.episode_action_time+yellow_phase_time+offset_phase == i:
+                    if agent.episode_action_time+yellow_phase_time+offset_phase <= i:
+                        
                         #print(first_obs[agent_id], agent_obs)
                         #print("----")
                         first_obs[agent_id] = agent_obs
                         
                         time = agent.get_action(first_obs[agent_id])
                         agent.action_time = time
-                        agent.episode_action_time += 10 + time*2 ## Parte de 10 segundos + tempo decidido pelo modelo (10,12,14,16,18...)
-                        
+                        agent.episode_action_time += (time+1)*5 ## Parte de 0 segundos + tempo decidido pelo modelo (0,5,10,15,20...)
                         phase = agent.I.current_phase
+                        #print(i,agent_obs,time,phase,agent.actual_phase)
+                        #print(time)
 
             ### Para cada action interval
             for _ in range(args.action_interval):

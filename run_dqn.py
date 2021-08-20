@@ -1,7 +1,7 @@
 import gym
 from environment import TSCEnv
 from world import World
-from generator import LaneVehicleGenerator
+from generator import LaneVehicleGenerator, StateOfThreeGenerator
 from agent.dqn_agent import DQNAgent
 from metric import TravelTimeMetric, ThroughputMetric, SpeedScoreMetric
 import argparse
@@ -49,7 +49,6 @@ for i in world.intersections:
     ))
     if args.load_model:
         agents[-1].load_model(args.save_dir)
-
 
 # Create metric
 metric = [TravelTimeMetric(world), ThroughputMetric(world), SpeedScoreMetric(world)]
@@ -111,8 +110,6 @@ def train(args, env):
             
         for agent_id, agent in enumerate(agents):
             logger.info("agent:{}, mean_episode_reward:{}".format(agent_id, episodes_rewards[agent_id] / episodes_decision_num))
-
-        print("------")
         
         for metric in env.metric:
             print("{} is {:.4f}".format(metric.name, metric.eval()))

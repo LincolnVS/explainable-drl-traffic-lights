@@ -330,6 +330,30 @@ class World(object):
         #print(state_of_three)
         return state_of_three
 
+    def get_state_of_three_by_phase(self,intersection,current_phase):
+        
+        for i in self.intersections:
+            if i == intersection:
+                ##Pega lanes da fase atual
+                act_phase = current_phase
+                act_roads = i.phase_available_startlanes[act_phase]
+                ##Pega ruas da proxima fase
+                nxt_phase = (act_phase+1) % len(i.phases)
+                nxt_roads = i.phase_available_startlanes[nxt_phase]
+                ##Pega ruas das outras fases (excluindo as que ja foram incluidas no act_roads e nxt_roads)
+                otr_roads = [road for road in i.startlanes if (road not in act_roads) and (road not in nxt_roads)]
+                #print(act_roads)
+                #print(nxt_roads)
+                #print(otr_roads)
+                vehicles = self.eng.get_lane_waiting_vehicle_count()
+
+                act_vehicles = np.sum([vehicles[key] for key in vehicles if key in act_roads])  
+                nxt_vehicles = np.sum([vehicles[key] for key in vehicles if key in nxt_roads]) 
+                otr_vehicles = np.sum([vehicles[key] for key in vehicles if key in otr_roads]) 
+
+
+        return [act_vehicles,nxt_vehicles,otr_vehicles]
+
     def get_vehicle_trajectory(self):
         # lane_id and time spent on the corresponding lane that each vehicle went through
         vehicle_lane = self.get_vehicle_lane()
