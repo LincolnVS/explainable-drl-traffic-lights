@@ -13,6 +13,8 @@ import numpy as np
 import logging
 from datetime import datetime
 import utils as u
+
+import ntpath
 # parse args
 parser = argparse.ArgumentParser(description='Run Example')
 parser.add_argument('config_file', type=str, help='path of config file')
@@ -52,7 +54,7 @@ flag_mean_reward = info_file['flag_mean_reward']
 episodes = args.episodes if info_file['flag_arg_episode'] else info_file['episodes']
 
 #start wandb
-u.wand_init("c1",f'dqn_{file_name_time}')
+u.wand_init("tlc",ntpath.basename({args.info_file})[:-5],'dqn')
 
 # create world
 world = World(args.config_file, thread_num=args.thread)

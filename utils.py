@@ -6,10 +6,8 @@ import json
 
 import wandb
 #wandb
-def wand_init(project_name='my-test-project',run_name='test'):
-    wandb.init(project=project_name)
-    wandb.run.name = run_name
-    wandb.run.save()
+def wand_init(project_name='my-test-project',name=None,group=None):
+    wandb.init(project=project_name,name=run_name,group=group)
 
 def wand_log(dict):
     wandb.log(dict)
