@@ -3,7 +3,7 @@ green_v=(10 15 20 25 30)
 red_v=(20 25 30 35 40)
 
 file_name="log/sotl/real1x1.log"
-dataset_name="envs/real_1x1/config_4p.json"
+dataset_name="envs/real_1x1/config_cluster.json"
 
 echo "...Starting all sotl possibilities..." | tee $file_name
 for mgt in "${min_green_time[@]}"
