@@ -4,6 +4,7 @@ from world import World
 from agent import MaxPressureAgent
 from metric import TravelTimeMetric, ThroughputMetric, SpeedScoreMetric
 
+import utils as u
 import argparse
 #Parse args
 parser = argparse.ArgumentParser(description='Run Example')
@@ -17,6 +18,9 @@ args = parser.parse_args()
 options = {
     'delta_t':args.delta_t
 }
+
+#start wandb
+u.wand_init("tlc",str(args.delta_t),'max_pressure')
 
 #Create world
 world = World(args.config_file, thread_num=args.thread)
@@ -32,28 +36,41 @@ metric = [TravelTimeMetric(world), ThroughputMetric(world), SpeedScoreMetric(wor
 
 #Create env
 env = TSCEnv(world, agents, metric)
-
-obs = env.reset()
-actions = []
-steps = 0
-
-#Walk through the steps
-while steps < args.steps:
-
+for e in range(200):
+    obs = env.reset()
     actions = []
-    #Get the agents' actions
-    for agent_id, agent in enumerate(agents):
-        actions.append(agent.get_action(obs[agent_id]))
+    steps = 0
+    episodes_rewards = 0
 
-    #Run steps
-    obs, rewards, dones, info = env.step(actions)
-    steps += 1
+    #Walk through the steps
+    while steps < args.steps:
 
-    #Check if it's over by flag "Done"
-    if all(dones) == True:
-        print(i)
-        break
+        actions = []
+        #Get the agents' actions
+        for agent_id, agent in enumerate(agents):
+            actions.append(agent.get_action(obs[agent_id]))
+
+        #Run steps
+        obs, rewards, dones, info = env.step(actions)
+        steps += 1
+        episodes_rewards += rewards[0]
+        #Check if it's over by flag "Done"
+        if all(dones) == True:
+            print(i)
+            break
+
+
+    eval_dict = {}
+    eval_dict["epsilon"]=0
+    eval_dict["episode"]=e
+    eval_dict["steps"]=3600
+    eval_dict["mean_episode_reward"]=episodes_rewards/3600
+
+    for metric in env.metric:
+        eval_dict[metric.name]=metric.eval()
+        
+    u.wand_log(eval_dict)
 
 #Print all metrics
-for metric in env.metric:
-    print("{} is {:.4f}".format(metric.name, metric.eval()))
+#for metric in env.metric:
+#    print("{} is {:.4f}".format(metric.name, metric.eval()))

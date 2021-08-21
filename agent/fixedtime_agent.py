@@ -32,8 +32,7 @@ class Fixedtime_Agent(BaseAgent):
         return -1*pressures
 
     def get_action(self, world):
-
-        if self.I.current_phase_time >= self.phase_time:
+        if self.I.current_phase_time >= self.phase_time and self.I.current_phase == self.action:
             self.action = (self.action + 1) % self.action_space.n
 
         return self.action

@@ -37,41 +37,41 @@ metric = [TravelTimeMetric(world), ThroughputMetric(world), SpeedScoreMetric(wor
 #Create env
 env = TSCEnv(world, agents, metric)
 
-for e in range(200):
-    obs = env.reset()
+obs = env.reset()
+actions = []
+steps = 0
+episodes_rewards = 0
+
+#Walk through the steps
+while steps < args.steps:
+
     actions = []
-    steps = 0
-    episodes_rewards = 0
+    #Get the agents' actions
+    for agent_id, agent in enumerate(agents):
+        actions.append(agent.get_action(obs[agent_id]))
 
-    #Walk through the steps
-    while steps < args.steps:
+    #Run steps
+    obs, rewards, dones, info = env.step(actions)
+    steps += 1
+    episodes_rewards += rewards[0]
 
-        actions = []
-        #Get the agents' actions
-        for agent_id, agent in enumerate(agents):
-            actions.append(agent.get_action(obs[agent_id]))
+    #Check if it's over by flag "Done"
+    if all(dones) == True:
+        print(i)
+        break
 
-        #Run steps
-        obs, rewards, dones, info = env.step(actions)
-        steps += 1
-        episodes_rewards += rewards[0]
+eval_dict = {}
+eval_dict["epsilon"]=0
+eval_dict["steps"]=steps
+eval_dict["mean_episode_reward"]=episodes_rewards/steps
+for metric in env.metric:
+    eval_dict[metric.name]=metric.eval()
 
-        #Check if it's over by flag "Done"
-        if all(dones) == True:
-            print(i)
-            break
-
-    eval_dict = {}
-    eval_dict["epsilon"]=0
+for e in range(200):
     eval_dict["episode"]=e
-    eval_dict["steps"]=3600
-    eval_dict["mean_episode_reward"]=episodes_rewards/3600
 
-    for metric in env.metric:
-        eval_dict[metric.name]=metric.eval()
-        
     u.wand_log(eval_dict)
 
 #Print all metrics
-for metric in env.metric:
-    print("{} is {:.4f}".format(metric.name, metric.eval()))
+#for metric in env.metric:
+#    print("{} is {:.4f}".format(metric.name, metric.eval()))
