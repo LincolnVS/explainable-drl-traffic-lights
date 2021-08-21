@@ -8,6 +8,7 @@ class Fixedtime_Agent(BaseAgent):
         self.I = I
         self.world = world
         self.ob_generator = ob_generator
+        self.world.subscribe("pressure")
 
         self.action = 0
 
@@ -19,8 +20,16 @@ class Fixedtime_Agent(BaseAgent):
         else:
             return None
 
-    def get_reward(self):
-        return None
+    def get_pressures_reward(self):
+        #print(self.world.get_info("pressure"))
+        pressure = self.world.get_info("pressure")[self.I.id]
+        return pressure
+        
+    def get_reward(self,last_pressure=0):
+        pressures = self.get_pressures_reward()*0.005
+
+        #print(wait)
+        return -1*pressures
 
     def get_action(self, world):
 

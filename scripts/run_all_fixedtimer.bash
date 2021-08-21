@@ -1,7 +1,7 @@
 #!/bin/bash
 
 file_name="log/fixedtime/real1x1_1.log"
-dataset_name="envs/real_1x1/config_4p.json"
+dataset_name="envs/real_1x1/config_cluster3.json"
 
 min_time=1
 max_time=60
