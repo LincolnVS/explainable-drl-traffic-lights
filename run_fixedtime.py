@@ -19,9 +19,6 @@ options = {
     'phase_time':args.phase_time
 }
 
-#start wandb
-u.wand_init("tlc",str(args.phase_time),'fixed_time')
-
 # create world
 world = World(args.config_file, thread_num=args.thread)
 
@@ -53,25 +50,12 @@ while steps < args.steps:
     #Run steps
     obs, rewards, dones, info = env.step(actions)
     steps += 1
-    episodes_rewards += rewards[0]
 
     #Check if it's over by flag "Done"
     if all(dones) == True:
         print(i)
         break
 
-eval_dict = {}
-eval_dict["epsilon"]=0
-eval_dict["steps"]=steps
-eval_dict["mean_episode_reward"]=episodes_rewards/steps
-for metric in env.metric:
-    eval_dict[metric.name]=metric.eval()
-
-for e in range(200):
-    eval_dict["episode"]=e
-
-    u.wand_log(eval_dict)
-
 #Print all metrics
-#for metric in env.metric:
-#    print("{} is {:.4f}".format(metric.name, metric.eval()))
+for metric in env.metric:
+    print("{} is {:.4f}".format(metric.name, metric.eval()))
