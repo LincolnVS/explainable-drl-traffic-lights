@@ -10,6 +10,7 @@ class SOTLAgent(BaseAgent):
         self.I = I
         self.world = world
         self.world.subscribe("lane_waiting_count")
+        self.world.subscribe("pressure")
         self.ob_generator = ob_generator
 
         # the minimum duration of time of one phase
