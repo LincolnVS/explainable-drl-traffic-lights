@@ -6,13 +6,15 @@ from environment import TSCEnv
 from world import World
 from generator import LaneVehicleGenerator, StateOfThreeGenerator
 from agent.xqn_agent import XQNAgent
-from metric import TravelTimeMetric
+from metric import TravelTimeMetric,ThroughputMetric,SpeedScoreMetric
 import argparse
 import os
 import numpy as np
 import logging
 from datetime import datetime
 import utils as u
+
+import ntpath
 # parse args
 parser = argparse.ArgumentParser(description='Run Example')
 parser.add_argument('config_file', type=str, help='path of config file')
@@ -40,6 +42,9 @@ sh = logging.StreamHandler()
 sh.setLevel(logging.INFO)
 logger.addHandler(fh)
 logger.addHandler(sh)
+
+#start wandb
+u.wand_init("tlc",ntpath.basename(args.info_file)[:-5],'xqn')
 
 #Get file with informations
 info_file = u.get_info_file(args.info_file)
@@ -75,8 +80,10 @@ for i in world.intersections:
 
 
 print(i.phases)
-# create metric
-metric = TravelTimeMetric(world)
+
+# Create metric
+metric = [TravelTimeMetric(world), ThroughputMetric(world), SpeedScoreMetric(world)]
+
 
 # create env
 env = TSCEnv(world, agents, metric)
@@ -168,6 +175,24 @@ def train(args, env):
                 #for agent in agents:
                 #    agent.save_model(args.save_dir)
         logger.info(f"episode:{e}/{episodes-1}, steps:{i}, average travel time:{env.eng.get_average_travel_time()}")
+        
+
+        eval_dict = {}
+        eval_dict["episode"]=e
+        eval_dict["steps"]=i
+
+        for metric in env.metric:
+            logger.info(f"{metric.name}: {metric.eval()}")
+            eval_dict[metric.name]=metric.eval()
+
+        eval_dict["epsilon"]=agents[0].epsilon
+        eval_dict["mean_episode_reward"]=episodes_rewards[0] / episodes_decision_num[0]
+        
+        u.wand_log(eval_dict)
+
+        
+        
+        
         for agent_id, agent in enumerate(agents):
             logger.info(f"agent:{agent_id}, epsilon:{agent.epsilon}, mean_episode_reward:{episodes_rewards[agent_id] / episodes_decision_num[agent_id]}")
     logger.info("Parametros Utilizados")
