@@ -185,6 +185,7 @@ class World(object):
             "avg_travel_time":self.eng.get_average_travel_time,
             "pressure": self.get_pressure,
             "lane_waiting_time_count": self.get_lane_waiting_time_count,
+            "waiting_time_count": self.get_vehicle_waiting_time,
             "lane_delay": self.get_lane_delay,
             "vehicle_trajectory": self.get_vehicle_trajectory,
             "history_vehicles": self.get_history_vehicles,

@@ -1,9 +1,9 @@
 {
     "validation": true,
-    "batch_size":500,
-    "buffer_size":10,
-    "learning_start":500,
-    "update_model_freq":16,
+    "batch_size":100,
+    "buffer_size":5,
+    "learning_start":3000,
+    "update_model_freq":1,
     "update_target_model_freq":1,
     "gamma":0.7,
     "epsilon_start":0.1,
