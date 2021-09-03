@@ -6,7 +6,7 @@ info_file="agent/configs_new_dqn/"
 dataset_name="envs/real_1x1/config_cluster.json"
 
 min_test=0
-max_test=9216
+max_test=192
 
 echo "...Starting all sdqn..." | tee $file_name
 for i in $(seq $min_test $max_test)

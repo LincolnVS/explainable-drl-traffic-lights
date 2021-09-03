@@ -116,6 +116,7 @@ def train(args, env):
                         agent.replay()
                     if total_decision_num > agent.learning_start and total_decision_num % agent.update_target_model_freq == agent.update_target_model_freq - 1:
                         agent.update_target_network()
+                        
             if all(dones):
                 break
 

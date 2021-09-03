@@ -3,7 +3,6 @@
     
     "episodes": 200,
     "pre_train": true,
-    "pre_train_param": 5,
     "action_interval": 20,
 
     "gamma":0.95,
@@ -12,7 +11,7 @@
     "epsilon_decay":0.995,
 
     "batch_size":32,
-    "buffer_size":2000,
+    "buffer_size":1000,
     "learning_start":2000,
     "update_model_freq":1,
     "update_target_model_freq":20,
