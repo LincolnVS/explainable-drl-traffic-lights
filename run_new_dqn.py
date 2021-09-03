@@ -111,11 +111,11 @@ def train(args, env):
                 
                 last_obs = obs
 
-            for agent_id, agent in enumerate(agents):
-                if total_decision_num > agent.learning_start and total_decision_num % agent.update_model_freq == agent.update_model_freq - 1:
-                    agent.replay()
-                if total_decision_num > agent.learning_start and total_decision_num % agent.update_target_model_freq == agent.update_target_model_freq - 1:
-                    agent.update_target_network()
+                for agent_id, agent in enumerate(agents):
+                    if total_decision_num > agent.learning_start and total_decision_num % agent.update_model_freq == agent.update_model_freq - 1:
+                        agent.replay()
+                    if total_decision_num > agent.learning_start and total_decision_num % agent.update_target_model_freq == agent.update_target_model_freq - 1:
+                        agent.update_target_network()
             if all(dones):
                 break
 
