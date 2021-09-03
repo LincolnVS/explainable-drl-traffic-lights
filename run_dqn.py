@@ -3,7 +3,7 @@ from environment import TSCEnv
 from world import World
 from generator import LaneVehicleGenerator, StateOfThreeGenerator
 from agent.dqn_agent import DQNAgent
-from metric import TravelTimeMetric, ThroughputMetric, SpeedScoreMetric
+from metric import TravelTimeMetric, ThroughputMetric, SpeedScoreMetric,MaxWaitingTimeMetric,MinWaitingTimeMetric
 import argparse
 import os
 import numpy as np
@@ -51,7 +51,7 @@ for i in world.intersections:
         agents[-1].load_model(args.save_dir)
 
 # Create metric
-metric = [TravelTimeMetric(world), ThroughputMetric(world), SpeedScoreMetric(world)]
+metric = [TravelTimeMetric(world), ThroughputMetric(world), SpeedScoreMetric(world), MaxWaitingTimeMetric(world)]
 
 # create env
 env = TSCEnv(world, agents, metric)
