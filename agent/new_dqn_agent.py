@@ -84,6 +84,7 @@ class DQNAgent(RLAgent):
 
         if self.first_replay:
             history = self.model.fit(obs, target_f, epochs=self.parameters['epochs_initial_replay'], verbose=0)
+            self.first_replay=False
         else:
             history = self.model.fit(obs, target_f, epochs=self.parameters['epochs_replay'], verbose=0)
             
