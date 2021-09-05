@@ -54,7 +54,7 @@ flag_mean_reward = info_file['flag_mean_reward']
 episodes = args.episodes if info_file['flag_arg_episode'] else info_file['episodes']
 
 #start wandb
-u.wand_init("tlc",ntpath.basename(args.info_file)[:-5],'sdqn')
+u.wand_init("TLC - Results", f"CWS_DQN: {ntpath.basename(args.info_file)[:-5]}",'CWS_DQN')
 
 # create world
 world = World(args.config_file, thread_num=args.thread)
