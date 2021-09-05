@@ -3,7 +3,7 @@
 file_name="log/my_sdqn_run.log"
 
 info_file="agent/configs_sdqn/"
-dataset_name="envs/real_1x1/config_cluster.json"
+dataset_name="envs/real_1x1/config_cluster2.json"
 
 min_test=1
 max_test=11
