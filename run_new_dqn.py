@@ -146,8 +146,6 @@ def train(args, env):
         u.wand_log(eval_dict)
 
 
-
-
 def test():
     obs = env.reset()
     for agent in agents:
