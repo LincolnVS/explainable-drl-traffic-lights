@@ -2,7 +2,7 @@ import gym
 from environment import TSCEnv
 from world import World
 from agent import MaxPressureAgent
-from metric import TravelTimeMetric, ThroughputMetric, SpeedScoreMetric
+from metric import TravelTimeMetric, ThroughputMetric, SpeedScoreMetric, MaxWaitingTimeMetric
 
 import utils as u
 import argparse
@@ -29,7 +29,7 @@ for i in world.intersections:
     agents.append(MaxPressureAgent(action_space,options, i, world))
 
 # Create metric
-metric = [TravelTimeMetric(world), ThroughputMetric(world), SpeedScoreMetric(world)]
+metric = [TravelTimeMetric(world), ThroughputMetric(world), SpeedScoreMetric(world), MaxWaitingTimeMetric(world)]
 
 #Create env
 env = TSCEnv(world, agents, metric)
@@ -50,12 +50,15 @@ while steps < args.steps:
     #Run steps
     obs, rewards, dones, info = env.step(actions)
     steps += 1
+    episodes_rewards += rewards[0]
 
     #Check if it's over by flag "Done"
     if all(dones) == True:
         print(i)
         break
 
-#Print all metrics
+print(f"\n--MaxPressure Results--")
+print(f"Steps: {steps}")
+print(f"Episodes Rewards: {episodes_rewards/steps:.4f}")
 for metric in env.metric:
-    print("{} is {:.4f}".format(metric.name, metric.eval()))
+    print(f"{metric.name}: {metric.eval():.4f}")

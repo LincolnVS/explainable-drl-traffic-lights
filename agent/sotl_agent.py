@@ -42,13 +42,6 @@ class SOTLAgent(BaseAgent):
                 action = (action + 1) % self.action_space.n
         return action
 
-    def get_pressures_reward(self):
-        #print(self.world.get_info("pressure"))
-        pressure = self.world.get_info("pressure")[self.I.id]
-        return pressure
-        
-    def get_reward(self,last_pressure=0):
-        pressures = self.get_pressures_reward()*0.005
-
-        #print(wait)
-        return -1*pressures
+    def get_reward(self):
+        pressure = self.world.get_info("pressure")[self.I.id]*0.005
+        return -1*pressure

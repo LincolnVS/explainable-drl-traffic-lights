@@ -2,7 +2,7 @@ import gym
 from environment import TSCEnv
 from world import World
 from agent import SOTLAgent
-from metric import TravelTimeMetric, ThroughputMetric, SpeedScoreMetric
+from metric import TravelTimeMetric, ThroughputMetric, SpeedScoreMetric, MaxWaitingTimeMetric
 
 import utils as u
 import argparse
@@ -23,9 +23,6 @@ options = {
     'red_v':args.red_v
 }
 
-#start wandb
-u.wand_init("tlc",f"{args.green_time} {args.green_v} {args.red_v}",'sotl')
-
 #Create world
 world = World(args.config_file, thread_num=args.thread)
 
@@ -36,44 +33,36 @@ for i in world.intersections:
     agents.append(SOTLAgent(action_space,options, i, world))
 
 # Create metric
-metric = [TravelTimeMetric(world), ThroughputMetric(world), SpeedScoreMetric(world)]
+metric = [TravelTimeMetric(world), ThroughputMetric(world), SpeedScoreMetric(world), MaxWaitingTimeMetric(world)]
 
 #Create env
 env = TSCEnv(world, agents, metric)
-for e in range(200):
-    obs = env.reset()
+
+obs = env.reset()
+actions = []
+steps = 0
+episodes_rewards = 0
+
+#Walk through the steps
+while steps < args.steps:
+
     actions = []
-    steps = 0
-    episodes_rewards = 0
+    #Get the agents' actions
+    for agent_id, agent in enumerate(agents):
+        actions.append(agent.get_action(obs[agent_id]))
 
-    #Walk through the steps
-    while steps < args.steps:
-
-        actions = []
-        #Get the agents' actions
-        for agent_id, agent in enumerate(agents):
-            actions.append(agent.get_action(obs[agent_id]))
-
-        #Run steps
-        obs, rewards, dones, info = env.step(actions)
-        steps += 1
-
-        #Check if it's over by flag "Done"
-        if all(dones) == True:
-            print(i)
-            break
-
-    eval_dict = {}
-    eval_dict["epsilon"]=0
-    eval_dict["episode"]=e
-    eval_dict["steps"]=3600
-    eval_dict["mean_episode_reward"]=episodes_rewards/3600
-
-    for metric in env.metric:
-        eval_dict[metric.name]=metric.eval()
-        
-    u.wand_log(eval_dict)
-
-#Print all metrics
-#for metric in env.metric:
-#    print("{} is {:.4f}".format(metric.name, metric.eval()))
+    #Run steps
+    obs, rewards, dones, info = env.step(actions)
+    steps += 1
+    episodes_rewards += rewards[0]
+    
+    #Check if it's over by flag "Done"
+    if all(dones) == True:
+        print(i)
+        break
+    
+print(f"\n--SOTL Results--")
+print(f"Steps: {steps}")
+print(f"Episodes Rewards: {episodes_rewards/steps:.4f}")
+for metric in env.metric:
+    print(f"{metric.name}: {metric.eval():.4f}")
