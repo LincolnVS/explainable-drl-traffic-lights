@@ -91,8 +91,9 @@ def train(args, env):
         else:
             env.eng.set_save_replay(False)
         
-        for agent_id, agent in enumerate(agents):
-            agent.obs = obs[agent_id]
+        #for agent_id, agent in enumerate(agents):
+        #    agent.obs = obs[agent_id]
+
         episodes_rewards = [0 for i in agents]
         td_errors = [0 for i in agents]
         episodes_decision_num = 0
@@ -124,8 +125,8 @@ def train(args, env):
                 
                 last_obs = obs
 
-            if all(dones):
-                break
+            #if all(dones):
+            #    break
 
         if e % args.save_rate == args.save_rate - 1:
             if not os.path.exists(args.save_dir):
@@ -134,7 +135,7 @@ def train(args, env):
                 agent.save_model(args.save_dir)
 
 
-        print(f"episode:{e}/{args.episodes}")
+        print(f"episode:{e}/{args.episodes}, epi total decisions: {episodes_decision_num}")
 
         eval_dict = {}
         eval_dict["episode"]=e
@@ -148,6 +149,8 @@ def train(args, env):
         for agent_id, agent in enumerate(agents):
             mean_reward[agent_id] = episodes_rewards[agent_id] / episodes_decision_num
             mean_td_error[agent_id] = td_errors[agent_id] / episodes_decision_num
+            print(f"\tmean reward: {mean_reward[agent_id]}")
+            print(f"\tmean td error: {mean_td_error[agent_id]}")
 
             eval_dict["epsilon"]=agent.epsilon
             eval_dict["mean_episode_reward"]=mean_reward[agent_id]
