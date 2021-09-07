@@ -17,7 +17,7 @@ class LaneVehicleGenerator(BaseGenerator):
         "all" means take average of all lanes
     negative : boolean, whether return negative values (mostly for Reward)
     """
-    def __init__(self, world, I, fns, in_only=False, average=None, negative=False):
+    def __init__(self, world, I, fns, in_only=False, average=None, negative=False, scale = 1):
         self.world = world
         self.I = I
 
@@ -42,9 +42,9 @@ class LaneVehicleGenerator(BaseGenerator):
         elif average == "all":
             size = 1
         self.ob_length = len(fns) * size
-
+        
         self.average = average
-        self.negative = negative
+        self.scale = (-1)*scale if negative else scale
 
     def generate(self):
         results = [self.world.get_info(fn) for fn in self.fns]
@@ -67,8 +67,10 @@ class LaneVehicleGenerator(BaseGenerator):
             if self.average == "all":
                 fn_result = np.mean(fn_result)
             ret = np.append(ret, fn_result)
-        if self.negative:
-            ret = ret * (-1)
+
+        
+        ret *= self.scale
+
         return ret
 
 if __name__ == "__main__":
