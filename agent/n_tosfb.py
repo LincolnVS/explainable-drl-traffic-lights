@@ -23,11 +23,11 @@ class FourierBasis:
         return lrs
     
     def _build_coefficients(self):
-        coeff = np.array(np.zeros(self.state_dim))  # Bias
+        coeff = np.array(np.zeros(self.state_dim), dtype=np.float32)  # Bias
         for i in range(1, self.max_non_zero + 1):
             for indices in combinations(range(self.state_dim), i):
                 for c in product(range(1, self.order + 1), repeat=i):
-                    coef = np.zeros(self.state_dim)
+                    coef = np.zeros(self.state_dim, dtype=np.float32)
                     coef[list(indices)] = list(c)
                     coeff = np.vstack((coeff, coef))
         return coeff
@@ -51,11 +51,11 @@ class TOSFB(RLAgent):
         self.world.subscribe("pressure")
 
         self.action_dim = action_space.n
-        self.state_dim = ob_generator.ob_shape[0]
+        self.state_dim = ob_generator.ob_length
         self.learning_start = 0
 
-        self.gamma = 0.7  # discount rate
-        self.alpha = 0.005 #0.005
+        self.gamma = 0.9  # discount rate
+        self.alpha = 0.0005
         self.lr = self.alpha
         self.lamb = 0.9
         self.epsilon = 1.0
@@ -68,11 +68,10 @@ class TOSFB(RLAgent):
         if basis == 'fourier':
             self.basis = FourierBasis(self.state_dim, self.action_dim, self.fourier_order, max_non_zero=self.max_non_zero_fourier)
             self.lr = self.basis.get_learning_rates(self.alpha)
-
         self.num_basis = self.basis.get_num_basis()
 
-        self.et = {a: np.zeros(self.num_basis) for a in range(self.action_dim)}
-        self.theta = {a: np.zeros(self.num_basis) for a in range(self.action_dim)}
+        self.et = {a: np.zeros(self.num_basis, dtype=np.float32) for a in range(self.action_dim)}
+        self.theta = {a: np.zeros(self.num_basis, dtype=np.float32) for a in range(self.action_dim)}
 
         self.q_old = None
         self.action = None
@@ -141,13 +140,12 @@ class TOSFB(RLAgent):
             next_q = 0.0
         td_error = reward + self.gamma * next_q - q
         self.td_error = td_error
-        #print(td_error)
         if self.q_old is None:
             self.q_old = q
 
         for a in range(self.action_dim):
             if a == action:
-                self.et[a] = self.lamb*self.gamma*self.et[a] + phi -(self.lr*self.gamma*self.lamb*np.dot(self.et[a],phi))*phi
+                self.et[a] = self.lamb*self.gamma*self.et[a] + (1 - self.lr*self.gamma*self.lamb*np.dot(self.et[a],phi))*phi
                 self.theta[a] += self.lr*(td_error + q - self.q_old)*self.et[a] - self.lr*(q - self.q_old)*phi
             else:
                 self.et[a] = self.lamb*self.gamma*self.et[a]
@@ -158,7 +156,6 @@ class TOSFB(RLAgent):
             self.reset_traces()
         
         self.epsilon = max(self.epsilon_decay*self.epsilon, self.min_epsilon)
-        #print(self.epsilon)
 
     """ def replay(self):
         minibatch = random.sample(self.memory, self.batch_size)

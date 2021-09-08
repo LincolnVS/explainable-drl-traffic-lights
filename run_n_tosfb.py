@@ -1,7 +1,7 @@
 import gym
 from environment import TSCEnv
 from world import World
-from generator import LaneVehicleGenerator, StateOfThreeGenerator
+from generator import LaneVehicleGenerator, StateOfThreeGenerator,PressureRewardGenerator
 from agent.dqn_agent import DQNAgent
 from agent.n_tosfb import TOSFB
 from metric import TravelTimeMetric, ThroughputMetric, SpeedScoreMetric,MaxWaitingTimeMetric
@@ -49,8 +49,8 @@ for i in world.intersections:
     action_space = gym.spaces.Discrete(len(i.phases))
     agents.append(TOSFB(
         action_space,
-        StateOfThreeGenerator(world, i, ["state_of_three"], in_only=True, average=None),
-        LaneVehicleGenerator(world, i, ["lane_waiting_count"], in_only=True, average="all", negative=True),
+        LaneVehicleGenerator(world, i, ["lane_count"], in_only=True, average=None),
+        PressureRewardGenerator(world, i, scale=.005, negative=True),
         i,
         world
     ))
@@ -85,6 +85,9 @@ def train(args, env):
 
         obs = env.reset()
         last_obs = obs
+        for agent_id, agent in enumerate(agents):
+            last_obs[agent_id] = np.array(last_obs[agent_id], dtype=np.float32)*0.01
+
         if e % args.save_rate == args.save_rate - 1:
             env.eng.set_save_replay(True)
             env.eng.set_replay_file("replay_%s.txt" % e)
@@ -111,6 +114,9 @@ def train(args, env):
                 rewards_list = []
                 for _ in range(args.action_interval):
                     obs, rewards, dones, _ = env.step(actions)
+                    for agent_id, agent in enumerate(agents):
+                        obs[agent_id] = np.array(obs[agent_id], dtype=np.float32)*0.01
+
                     i += 1
                     rewards_list.append(rewards)
                 
