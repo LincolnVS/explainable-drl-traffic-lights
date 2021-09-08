@@ -46,7 +46,7 @@ parameters['log_path'] = args.log_dir
 action_interval = parameters['action_interval']
 
 #start wandb
-u.wand_init("n_dqn2",f"new_dqn: {ntpath.basename(args.parameters)[:-5]}", "new_dqn")
+u.wand_init("n_dqn3",f"new_dqn: {ntpath.basename(args.parameters)[:-5]}", "new_dqn")
 
 # create world
 world = World(args.config_file, thread_num=args.thread)
@@ -57,7 +57,7 @@ for i in world.intersections:
     action_space = gym.spaces.Discrete(len(i.phases))
     agents.append(DQNAgent(
         action_space,
-        LaneVehicleGenerator(world, i, ["lane_count"], in_only=True, average=None, scale=.01),
+        LaneVehicleGenerator(world, i, ["lane_count"], in_only=True, average=None, scale=.025),
         PressureRewardGenerator(world, i, scale=.005, negative=True),
         i.id,
         parameters
@@ -101,6 +101,7 @@ def train(args, env):
                     obs, rewards, dones, _ = env.step(actions)
                     i += 1
                     rewards_list.append(rewards)
+                print(obs)
                 rewards = np.mean(rewards_list, axis=0)
 
                 for agent_id, agent in enumerate(agents):
