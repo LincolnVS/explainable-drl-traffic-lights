@@ -2,13 +2,13 @@
 
 file_name="log/my_new_dqn_run.log"
 
-info_file="agent/configs_new_dqn3/"
+info_file="agent/configs_new_dqn4/"
 dataset_name="envs/real_1x1/config_cluster.json"
 
-min_test=1
-max_test=17
+min_test=0
+max_test=16
 
-echo "...Starting all sdqn..." | tee $file_name
+echo "...Starting all new_dqn..." | tee $file_name
 for i in $(seq $min_test $max_test)
 do
    echo "Running $i/$max_test, $info_file$i.json"  | tee -a $file_name
