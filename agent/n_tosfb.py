@@ -57,9 +57,9 @@ class TOSFB(RLAgent):
         self.gamma = 0.9  # discount rate
         self.alpha = 0.0005
         self.lr = self.alpha
-        self.lamb = 0.9
-        self.epsilon = 1.0
-        self.epsilon_decay = 0.9995 #0.9995
+        self.lamb = 0 #0.9
+        self.epsilon = 0.01
+        self.epsilon_decay = 1 #0.9995 #0.9995
         self.min_epsilon = 0.01
         self.fourier_order = 9 #9
         self.max_non_zero_fourier = 2
@@ -72,6 +72,9 @@ class TOSFB(RLAgent):
 
         self.et = {a: np.zeros(self.num_basis, dtype=np.float32) for a in range(self.action_dim)}
         self.theta = {a: np.zeros(self.num_basis, dtype=np.float32) for a in range(self.action_dim)}
+
+        self.use_buffer = True
+        self.buffer = deque(maxlen=1000)
 
         self.q_old = None
         self.action = None
@@ -129,31 +132,38 @@ class TOSFB(RLAgent):
         return self.action_space.sample()
 
     def remember(self, state, action, reward, next_state, done=False):
-        phi = self.get_features(state)
-        next_phi = self.get_features(next_state)
-        q = self.get_q_value(phi, action)
-        if not done:
-            """ q_values = [self.get_q_value(next_phi, a) for a in range(self.action_dim)]
-            next_q = max(q_values) """
-            next_q = self.get_q_value(next_phi, self.act(next_phi))
+        if self.use_buffer:
+            self.buffer.append((state, action, reward, next_state))
+            minibatch = [(state, action, reward, next_state)] + random.sample(self.buffer, min(31, len(self.buffer)))
         else:
-            next_q = 0.0
-        td_error = reward + self.gamma * next_q - q
-        self.td_error = td_error
-        if self.q_old is None:
-            self.q_old = q
-
-        for a in range(self.action_dim):
-            if a == action:
-                self.et[a] = self.lamb*self.gamma*self.et[a] + (1 - self.lr*self.gamma*self.lamb*np.dot(self.et[a],phi))*phi
-                self.theta[a] += self.lr*(td_error + q - self.q_old)*self.et[a] - self.lr*(q - self.q_old)*phi
+            minibatch = [(state, action, reward, next_state)]
+        for sample in minibatch:
+            state, action, reward, next_state = sample
+            phi = self.get_features(state)
+            next_phi = self.get_features(next_state)
+            q = self.get_q_value(phi, action)
+            if not done:
+                """ q_values = [self.get_q_value(next_phi, a) for a in range(self.action_dim)]
+                next_q = max(q_values) """
+                next_q = self.get_q_value(next_phi, self.act(next_phi))
             else:
-                self.et[a] = self.lamb*self.gamma*self.et[a]
-                self.theta[a] += self.lr*(td_error + q - self.q_old)*self.et[a]
-        
-        self.q_old = next_q
-        if done:
-            self.reset_traces()
+                next_q = 0.0
+            td_error = reward + self.gamma * next_q - q
+            self.td_error = td_error
+            if self.q_old is None:
+                self.q_old = q
+
+            for a in range(self.action_dim):
+                if a == action:
+                    self.et[a] = self.lamb*self.gamma*self.et[a] + (1 - self.lr*self.gamma*self.lamb*np.dot(self.et[a],phi))*phi
+                    self.theta[a] += self.lr*(td_error + q - self.q_old)*self.et[a] - self.lr*(q - self.q_old)*phi
+                else:
+                    self.et[a] = self.lamb*self.gamma*self.et[a]
+                    self.theta[a] += self.lr*(td_error + q - self.q_old)*self.et[a]
+            
+            self.q_old = next_q
+            if done:
+                self.reset_traces()
         
         self.epsilon = max(self.epsilon_decay*self.epsilon, self.min_epsilon)
 
