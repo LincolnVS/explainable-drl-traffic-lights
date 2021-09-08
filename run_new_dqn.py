@@ -101,7 +101,6 @@ def train(args, env):
                     obs, rewards, dones, _ = env.step(actions)
                     i += 1
                     rewards_list.append(rewards)
-                print(obs)
                 rewards = np.mean(rewards_list, axis=0)
 
                 for agent_id, agent in enumerate(agents):

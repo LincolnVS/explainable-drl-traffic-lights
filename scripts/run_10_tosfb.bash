@@ -11,6 +11,6 @@ echo "...Starting 10 tosfb..." | tee $file_name
 for i in $(seq $min_test $max_test)
 do
    echo "Running $i/$max_test"  | tee -a $file_name
-   python run_new_dqn.py $dataset_name | tee -a $file_name
+   python run_n_tosfb.py $dataset_name | tee -a $file_name
    printf "\n" | tee -a $file_name
 done   
