@@ -2,7 +2,7 @@
 
 file_name="log/tosfb.log"
 
-dataset_name="envs/real_1x1/config_cluster.json"
+dataset_name="envs/real_1x1/config_cluster2.json"
 
 min_test=1
 max_test=10
