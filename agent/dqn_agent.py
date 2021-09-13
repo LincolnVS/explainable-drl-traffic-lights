@@ -6,6 +6,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam, RMSprop, SGD
 import os
+from agent.SamplerAlgorithms import ProportionalSampler2 as ProportionalSampler
 
 class DQNAgent(RLAgent):
     def __init__(self, action_space, ob_generator, reward_generator, iid):

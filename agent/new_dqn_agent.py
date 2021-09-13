@@ -7,6 +7,7 @@ from keras.layers import Dense
 from keras.optimizers import Adam, RMSprop, SGD
 from keras.utils import plot_model
 import os
+from agent.SamplerAlgorithms import ProportionalSampler2 as ProportionalSampler
 
 class DQNAgent(RLAgent):
     def __init__(self, action_space, ob_generator, reward_generator, iid, parameters):
@@ -24,6 +25,9 @@ class DQNAgent(RLAgent):
 
         self.batch_size = self.parameters['batch_size']
         self.memory = deque(maxlen=self.parameters["buffer_size"])
+        
+        self.sampler_algorithm = ProportionalSampler(self.parameters["buffer_size"],self.parameters['batch_size'])
+
         self.learning_start = self.parameters["learning_start"]
         self.update_model_freq = self.parameters["update_model_freq"]
         self.update_target_model_freq = self.parameters["update_target_model_freq"]
@@ -72,7 +76,8 @@ class DQNAgent(RLAgent):
         self.memory.append((ob, action, reward, next_ob))
 
     def replay(self):
-        minibatch = random.sample(self.memory, self.batch_size)
+        #minibatch = random.sample(self.memory, self.batch_size)
+        minibatch = self.sampler_algorithm.get_sample(self.memory)
         obs, actions, rewards, next_obs = [np.stack(x) for x in np.array(minibatch).T]
 
         target = rewards + self.gamma * np.amax(self.target_model.predict(next_obs), axis=1)

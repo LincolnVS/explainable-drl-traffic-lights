@@ -170,7 +170,7 @@ def hypertune_parameters():
     pass
 
 
-X,y = get_dataset("log/my_sdqn/20210820-161915_0.csv")
+X,y = get_dataset("agent/configs_xqn/buffer.csv")
 
 #split_test(X,y)
 

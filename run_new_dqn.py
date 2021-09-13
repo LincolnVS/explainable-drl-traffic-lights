@@ -32,7 +32,11 @@ if not os.path.exists(args.log_dir):
     os.makedirs(args.log_dir)
 logger = logging.getLogger('main')
 logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler(os.path.join(args.log_dir, datetime.now().strftime('%Y%m%d-%H%M%S') + ".log"))
+
+file_name_time = f"{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+file_name = f"{args.log_dir}/{file_name_time}"
+
+fh = logging.FileHandler(file_name+'.log')
 fh.setLevel(logging.DEBUG)
 sh = logging.StreamHandler()
 sh.setLevel(logging.INFO)
@@ -104,6 +108,7 @@ def train(args, env):
                 rewards = np.mean(rewards_list, axis=0)
 
                 for agent_id, agent in enumerate(agents):
+                    u.append_new_line(file_name+f"_{agent_id}",[[last_obs[agent_id],-1], actions[agent_id], rewards[agent_id], [obs[agent_id],-1],e,i])
                     agent.remember(last_obs[agent_id], actions[agent_id], rewards[agent_id], obs[agent_id])
                     episodes_rewards[agent_id] += rewards[agent_id]
                     episodes_decision_num += 1
