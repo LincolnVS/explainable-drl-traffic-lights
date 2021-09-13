@@ -11,7 +11,7 @@ import tensorflow as tf
 from tensorflow.keras import initializers
 from keras.losses import Huber
 import os
-from agent.SamplerAlgorithms import ProportionalSampler2 as ProportionalSampler
+from agent.SamplerAlgorithms import ProportionalSampler as ProportionalSampler
 import time
 
 def current_milli_time():
