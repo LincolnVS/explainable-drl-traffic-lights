@@ -127,7 +127,7 @@ def objective(space):
     import xgboost as xgb
     from sklearn.metrics import accuracy_score
 
-    X,y = get_dataset("log/my_sdqn/20210820-161915_0.csv")
+    X,y = get_dataset("agent/configs_xqn/buffer.csv")
     X,Xt,y,yt = ttsplit(X, y, test_size=0.33, random_state=42)
 
 
