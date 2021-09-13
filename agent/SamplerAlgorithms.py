@@ -41,7 +41,9 @@ class ProportionalSampler(object):
         aux = []
         for _ in range(self.batch_size):
             aux.append(self.proportional_sample(buffer))
-        return aux
+            
+        minibatch = [buffer[i] for i in aux]  
+        return minibatch
 
 class ProportionalSampler2(object):
     def __init__(self, buffer_size, batch_size):

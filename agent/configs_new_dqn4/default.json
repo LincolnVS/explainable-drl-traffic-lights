@@ -9,7 +9,7 @@
    "epsilon_decay":0.999,
    "batch_size":32,
    "buffer_size":5000,
-   "learning_start":2000,
+   "learning_start":32,
    "update_model_freq":2,
    "update_target_model_freq":20,
    "epochs_replay":1,
