@@ -1,7 +1,7 @@
 # decision tree for multioutput regression
 from scipy.sparse import data
 from sklearn.datasets import make_regression
-from xgboost import XGBRegressor,XGBClassifier, DMatrix
+from xgboost import XGBRegressor
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.model_selection import train_test_split as ttsplit
 from sklearn.model_selection import KFold
@@ -124,21 +124,15 @@ def split_test(X,y):
 
 
 def objective(space):
-    import xgboost as xgb
-    from sklearn.metrics import accuracy_score
 
-    X,y = get_dataset("agent/configs_xqn/buffer.csv")
-    X,Xt,y,yt = ttsplit(X, y, test_size=0.33, random_state=42)
-
+    global X,Xt,y,yt 
 
     clf=MultiOutputRegressor(XGBRegressor(
-                    n_estimators =180, max_depth = 18, gamma = 1.0084573146866125,
-                    reg_alpha = 43.0,min_child_weight=4.0))
+                    n_estimators = int(space['n_estimators']), max_depth = int(space['max_depth']), gamma =  space['gamma'],
+                    reg_alpha = space['reg_alpha'],reg_lambda = space['reg_lambda'],min_child_weight=space['min_child_weight']))
 
-    
     clf.fit(X, y,verbose=False)
     
-
     pred = clf.predict(Xt)
     accuracy = mean_squared_error(yt, pred)
     print ("SCORE:", accuracy)
@@ -148,13 +142,13 @@ def hypertune_parameters():
     # import packages for hyperparameters tuning
 
 
-    space={'max_depth': hp.quniform("max_depth", 3, 18, 1),
+    space={'max_depth': hp.quniform("max_depth", 3, 20, 1),
         'gamma': hp.uniform ('gamma', 1,9),
         'reg_alpha' : hp.quniform('reg_alpha', 40,180,1),
         'reg_lambda' : hp.uniform('reg_lambda', 0,1),
         'colsample_bytree' : hp.uniform('colsample_bytree', 0.5,1),
         'min_child_weight' : hp.quniform('min_child_weight', 0, 10, 1),
-        'n_estimators': 180,
+        'n_estimators': hp.quniform("n_estimators", 100, 200, 5) ,
         'seed': 0
     }
 
@@ -163,16 +157,19 @@ def hypertune_parameters():
     best_hyperparams = fmin(fn = objective,
                             space = space,
                             algo = tpe.suggest,
-                            max_evals = 100,
+                            max_evals = 500,
                             trials = trials)
 
     print(best_hyperparams)
     pass
 
 
-X,y = get_dataset("agent/configs_xqn/buffer.csv")
+X_data,y_data = get_dataset("agent/configs_xqn/buffer.csv")
+X,Xt,y,yt = ttsplit(X_data, y_data, test_size=0.30, random_state=42)
+
+print(f"Tamanho dos dados de treino: {len(X)}")
+print(f"Tamanho dos dados de teste: {len(Xt)}")
 
 #split_test(X,y)
-
 hypertune_parameters()
 
