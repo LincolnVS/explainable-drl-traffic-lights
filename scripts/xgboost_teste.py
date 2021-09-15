@@ -164,7 +164,7 @@ def hypertune_parameters():
     pass
 
 
-X_data,y_data = get_dataset("agent/configs_xqn/buffer.csv")
+X_data,y_data = get_dataset("../agent/configs_xqn/buffer.csv")
 X,Xt,y,yt = ttsplit(X_data, y_data, test_size=0.30, random_state=42)
 
 print(f"Tamanho dos dados de treino: {len(X)}")
