@@ -149,7 +149,9 @@ def train(args, env):
         eval_dict["mean_episode_reward"]=episodes_rewards[0] / episodes_decision_num
         
         u.wand_log(eval_dict)
-
+        
+    for agent in agents:
+        agent.save_model(args.save_dir)
 
 def test():
     obs = env.reset()

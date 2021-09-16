@@ -8,6 +8,7 @@ from keras.optimizers import Adam, RMSprop, SGD
 from keras.utils import plot_model
 import os
 from agent.SamplerAlgorithms import ProportionalSampler2 as ProportionalSampler
+import pickle
 
 class DQNAgent(RLAgent):
     def __init__(self, action_space, ob_generator, reward_generator, iid, parameters):
@@ -97,13 +98,15 @@ class DQNAgent(RLAgent):
             self.epsilon *= self.epsilon_decay
 
     def load_model(self, dir="model/dqn"):
-        name = "dqn_agent_{}.h5".format(self.iid)
+        name = "dqn_agent_{}.pickle".format(self.iid)
         model_name = os.path.join(dir, name)
-        self.model.load_weights(model_name)
+        #self.model.load_weights(model_name)
+        self.model = pickle.load(open(f"{model_name}", "rb"))
 
     def save_model(self, dir="model/dqn"):
-        name = "dqn_agent_{}.h5".format(self.iid)
+        name = "dqn_agent_{}.pickle".format(self.iid)
         model_name = os.path.join(dir, name)
-        self.model.save_weights(model_name)
+        
+        pickle.dump(self.model, file = open(f"{model_name}", "wb"))
     
     
