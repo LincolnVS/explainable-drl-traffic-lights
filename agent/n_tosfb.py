@@ -1,10 +1,11 @@
+from world import Intersection
 from . import RLAgent
 import random
 import numpy as np
 from collections import deque
 import os
 from itertools import combinations, product
-
+import pickle
 
 class FourierBasis:
 
@@ -190,9 +191,22 @@ class TOSFB(RLAgent):
             self.epsilon *= self.epsilon_decay """
 
     def load_model(self, dir="model/tosfb"):
-        pass
+        with open(dir+'/model.pickle"', 'rb') as f:
+            self = pickle.load(f)
 
     def save_model(self, dir="model/tosfb"):
-        pass
-    
+        world = self.world
+        ob = self.ob_generator
+        rg = self.reward_generator
+        intersection = self.intersection
+        self.intersection = None
+        self.world = None
+        self.ob_generator = None
+        self.reward_generator = None
+        with open(dir+'/model.pickle', 'wb+') as f:
+            pickle.dump(self, f)
+        self.world = world
+        self.ob_generator = ob
+        self.reward_generator = rg
+        self.intersection = intersection
     
