@@ -37,9 +37,12 @@ class ProportionalSampler(object):
         else:
             return res
     
-    def get_sample(self, buffer):
+    def get_sample(self, buffer, batch_size = None):
+        if batch_size == None:
+            batch_size = self.batch_size
+
         aux = []
-        for _ in range(self.batch_size):
+        for _ in range(batch_size):
             aux.append(self.proportional_sample(buffer))
             
         minibatch = [buffer[i] for i in aux]  
@@ -54,7 +57,11 @@ class ProportionalSampler2(object):
         r =  np.random.choice(len(buffer), 1, replace=True)[0]
         return r
 
-    def get_sample(self, buffer):
+    def get_sample(self, buffer, batch_size = None):
+
+        if batch_size == None:
+            batch_size = self.batch_size
+
         buffer = np.array(buffer,dtype=object) # O(1)
         #print(buffer)
         buffer = buffer[buffer[:,2].argsort()[::-1]] # O(m log(m))
@@ -62,7 +69,7 @@ class ProportionalSampler2(object):
         b_len = len(buffer)  # O(1)
         p = np.arange(2/b_len - 1/(b_len**2),0,-2/(b_len**2)) # O(m)
         #print(p)
-        choices = np.random.choice(np.arange(b_len),self.batch_size,p=p) # O(m log n)
+        choices = np.random.choice(np.arange(b_len),batch_size,p=p) # O(m log n)
 
         minibatch = [buffer[i] for i in choices]
         return minibatch

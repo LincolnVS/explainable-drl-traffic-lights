@@ -49,7 +49,7 @@ def get_dataset(path):
     next_obs = convert_list_string_to_list_float(dataset["next_state"])
     actions = dataset['action']
 
-    targets_f = np.zeros((len(obs),26))
+    targets_f = np.zeros((len(obs),8))
                 
     for i, action in enumerate(actions):
         targets_f[i][action] = rewards[i]
@@ -92,13 +92,13 @@ class XQNAgent(RLAgent):
         self.epochs_initial_replay = self.parameters["epochs_initial_replay"]
 
         self.model = self._build_model()
-        self.first_replay = True
+        self.flag_ini_train = True
 
         self.ds_path = parameters['dataset_path'] 
 
 
     def get_action(self, ob):
-        if np.random.rand() <= self.epsilon:
+        if np.random.rand() <= self.epsilon or self.flag_ini_train:
             return self.action_space.sample()
         ob = self._reshape_ob(ob)
         act_values = self.model.predict(ob)
@@ -120,9 +120,9 @@ class XQNAgent(RLAgent):
         narray = [np.reshape(ob, (1, -1)) for ob in ob_array]
         return narray
     def update_target_network(self):
-        if self.total_decision > self.learning_start and not(self.total_decision%self.update_target_model_freq):
+        #if self.total_decision > self.learning_start and not(self.total_decision%self.update_target_model_freq):
             #self.target_model = deepcopy(self.model)
-            pass
+        pass
     
     def remember(self, ob,  action, reward, next_ob):
         #PASSAR LISTA PARA O DEQUE (não array) SE NÃO DA MERDA
@@ -132,53 +132,25 @@ class XQNAgent(RLAgent):
         if len(self.memory) < self.batch_size:
             return
         
-        minibatch = self.sampler_algorithm.get_sample(self.memory)
-        
+        minibatch = self.sampler_algorithm.get_sample(self.memory,len(self.memory))
+        print(len(minibatch))
         _obs, actions, rewards, _next_obs = [np.stack(x) for x in np.array(minibatch).T]
-        obs,phase = [np.stack(x) for x in np.array(_obs).T]
-        obs =  np.array(obs)
-        next_obs,next_phase = [np.stack(x) for x in np.array(_next_obs).T]
-        next_obs =  np.array(next_obs)
-        if self.flag_treino_inicial:
-            #monta arvore
-            print("--Montar Arvore no Primeiro Replay--")
-            targets_f = np.zeros((len(obs),self.action_space.n))
-                        
-            for i, action in enumerate(actions):
-                targets_f[i][action] = rewards[i]
-            #target = DMatrix(targets_f,label=obs)
-            self.model.fit(obs, targets_f,verbose=1)
-            self.target_model = deepcopy(self.model)
-            
-            self.flag_treino_inicial=False 
-            return
-        q2 = self.target_model.predict(next_obs)
-        delta = rewards + self.gamma * np.max(q2, axis=1)
-        targets = self.model.predict(obs)
-        
-        n_obs = []
-        dict_obs = {}
+        obs =  np.array(_obs)
+        next_obs =  np.array(_next_obs)
 
-         for i,action in enumerate(actions):
-            if obs[i].tolist() in n_obs:
-                key = str(obs[i].tolist())
-                valores = dict_obs[key]
-                dict_obs[key].append(i)
-                last_idx = valores[-1]
-                del valores[-1]
-                targets[last_idx][action] = delta[i]
-                targets[i] = targets[last_idx]
-                for v in valores:
-                    targets[v] = targets[i]
-            else:
-                key = str(obs[i].tolist())
-                n_obs.append(obs[i].tolist())
-                dict_obs[key] = [i]
-                targets[i][action] = delta[i] 
+        if self.flag_ini_train:
+            target = rewards
+            target_f = np.zeros((len(obs),self.action_space.n))   
+            self.flag_ini_train = False
+        else:
+            target = rewards + self.gamma * np.amax(self.model.predict(next_obs), axis=1)
+            target_f = self.model.predict(obs)
+
+        for i, action in enumerate(actions):
+            target_f[i][action] = target[i]
         
-        #print(obs, targets)
-        self.model.fit(obs, targets)
-        #print(f"loss: {np.mean(history.history['loss'])}") if self.flag_treino_inicial else None
+        self.model.fit(obs, target_f)
+        
 
     def load_model(self, dir="model/dqn"):
         name = "xqn_agent_{}.pickle".format(self.iid)
@@ -192,4 +164,8 @@ class XQNAgent(RLAgent):
         
         pickle.dump(self.model, file = open(f"{model_name}", "wb"))
     
-    
+    def decay_epsilon(self):
+        if self.decay_type == "linear":
+            self.epsilon = np.max([self.epsilon-self.epsilon_decay,self.epsilon_min])
+        else:
+            self.epsilon = np.max([self.epsilon*self.epsilon_decay,self.epsilon_min])
