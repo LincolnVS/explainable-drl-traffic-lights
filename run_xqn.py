@@ -52,7 +52,7 @@ action_interval = parameters['action_interval']
 
 parameters['dataset_path'] = args.dataset
 #start wandb
-#u.wand_init("TLC - Results",f"xqn: {ntpath.basename(args.parameters)[:-5]}", "xqn")
+u.wand_init("TLC - Results",f"xqn: {ntpath.basename(args.parameters)[:-5]}", "xqn")
 
 # create world
 world = World(args.config_file, thread_num=args.thread)
@@ -148,7 +148,7 @@ def train(args, env):
         eval_dict["epsilon"]=agents[0].epsilon
         eval_dict["mean_episode_reward"]=episodes_rewards[0] / episodes_decision_num
         
-        #u.wand_log(eval_dict)
+        u.wand_log(eval_dict)
         
     for agent in agents:
         agent.save_model(args.save_dir)
