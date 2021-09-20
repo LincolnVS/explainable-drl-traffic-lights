@@ -9,13 +9,15 @@ import os
 import numpy as np
 import logging
 from datetime import datetime
+import utils as u
+
 # parse args
 parser = argparse.ArgumentParser(description='Run Example')
 parser.add_argument('config_file', type=str, help='path of config file')
 parser.add_argument('--thread', type=int, default=1, help='number of threads')
 parser.add_argument('--steps', type=int, default=3600, help='number of steps')
 parser.add_argument('--action_interval', type=int, default=20, help='how often agent make decisions')
-parser.add_argument('--episodes', type=int, default=60, help='training episodes')
+parser.add_argument('--episodes', type=int, default=200, help='training episodes')
 parser.add_argument('--save_model', action="store_true", default=False)
 parser.add_argument('--load_model', action="store_true", default=False)
 parser.add_argument("--save_rate", type=int, default=20, help="save model once every time this many episodes are completed")
@@ -33,6 +35,8 @@ sh = logging.StreamHandler()
 sh.setLevel(logging.INFO)
 logger.addHandler(fh)
 logger.addHandler(sh)
+
+u.wand_init("TLC - Results",f"dqn:", "dqn")
 
 # create world
 world = World(args.config_file, thread_num=args.thread)
@@ -111,8 +115,15 @@ def train(args, env):
         for agent_id, agent in enumerate(agents):
             logger.info("agent:{}, mean_episode_reward:{}".format(agent_id, episodes_rewards[agent_id] / episodes_decision_num))
         
+        eval_dict = {}
+
         for metric in env.metric:
             print("{} is {:.4f}".format(metric.name, metric.eval()))
+            eval_dict[metric.name]=metric.eval()
+
+        u.wand_log(eval_dict)
+
+
 
 def test():
     obs = env.reset()

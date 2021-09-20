@@ -15,7 +15,7 @@ class DQNAgent(RLAgent):
 
         self.ob_length = ob_generator.ob_length
 
-        self.memory = deque(maxlen=2000)
+        self.memory = deque(maxlen=20000)
         self.learning_start = 2000
         self.update_model_freq = 1
         self.update_target_model_freq = 20
@@ -25,7 +25,7 @@ class DQNAgent(RLAgent):
         self.epsilon_min = 0.01
         self.epsilon_decay = 0.995
         self.learning_rate = 0.005
-        self.batch_size = 32
+        self.batch_size = 320
 
         self.model = self._build_model()
         self.target_model = self._build_model()
