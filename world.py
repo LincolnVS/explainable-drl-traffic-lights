@@ -190,7 +190,8 @@ class World(object):
             "vehicle_trajectory": self.get_vehicle_trajectory,
             "history_vehicles": self.get_history_vehicles,
             "car_count": self.get_car_count,
-            "state_of_three": self.get_state_of_three
+            "state_of_three": self.get_state_of_three,
+            "phase_vehicles": self.get_phase_vehicles
         }
         self.fns = []
         self.info = {}
@@ -304,6 +305,20 @@ class World(object):
                 lane_avg_speed /= lane_vehicle_count
             lane_delay[lane] = 1 - lane_avg_speed / speed_limit
         return lane_delay
+
+    def get_phase_vehicles(self):
+        phase_vehicles = {}
+
+        for i in self.intersections:
+            vehicles = self.eng.get_lane_waiting_vehicle_count()
+            v = []
+
+            for idx in range(8):
+                v.append(np.sum([vehicles[key] for key in vehicles if key in i.phase_available_startlanes[idx]]))
+
+            phase_vehicles[i.id] = v
+
+        return phase_vehicles
 
     def get_state_of_three(self):
         

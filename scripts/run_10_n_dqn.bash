@@ -12,7 +12,7 @@ echo "...Starting all sdqn..." | tee $file_name
 for i in $(seq $min_test $max_test)
 do
    echo "Running $i/$max_test, 8.json"  | tee -a $file_name
-   python run_new_dqn.py $dataset_name --parameters $info_file"8.json" | tee -a $file_name
+   python run_new_dqn_phase.py $dataset_name --parameters $info_file"8.json" | tee -a $file_name
    printf "\n" | tee -a $file_name
 done   
 
