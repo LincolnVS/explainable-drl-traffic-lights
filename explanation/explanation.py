@@ -23,6 +23,7 @@ parser.add_argument('--explainer_type', type=str,  default="deep", help='define 
 parser.add_argument('--force_new', type=bool, default=False, help='calculate new shap values even if we already have them')
 parser.add_argument('--mult_out_num', type=int, default=1, help='num of multplots we plot - 0 means none')
 parser.add_argument('--summary_plot', type=bool, default=True, help='if we plot summary')
+parser.add_argument('--forceplot_num',type=int, default=1, help='num of force plots for best action in x states - 0 means none')
 parser.add_argument('--num_states', type=int, default=5000, help='num of states we use to calculate shap values')
 parser.add_argument('--isx', type=int, default=16, help='image size x')
 parser.add_argument('--isy', type=int, default=8, help='image size y')
@@ -349,6 +350,38 @@ def plot_summary_per_action():
         plt.savefig(f"{args.output_path}summary_action/summary_{action}.pdf",bbox_inches = 'tight')
         plt.close()
 
-plot_multi_output(args.mult_out_num)
-plot_summary_per_action() if args.summary_plot else None
+def plot_force_plot_best_action(runs = 1):#Create Path to save 
+    Path(f"{args.output_path}forceplot").mkdir(parents=True, exist_ok=True)
 
+    for row_index in range(runs):
+        state = [np.ceil(s/.025) for s in shap_model.possibilits[row_index]]
+        best_action = np.argmax(predictions[row_index])
+
+        shap.force_plot(
+            shap_model.expected_value[best_action], 
+            shap_model.shap_values[best_action][row_index],
+            state, 
+            matplotlib=True,
+            show=False,
+            #feature_names=['Actual','Next','Others'],
+            feature_names=[f'F0: {state[0]}',f'F1: {state[1]}',f'F2: {state[2]}',f'F3: {state[3]}',f'F4: {state[4]}',f'F5: {state[5]}',f'F6: {state[6]}',f'F7: {state[7]}'], #None,
+            
+            )
+        ##ax = plt.gca().get_xlim()
+        ##ax_s = ax[1] - ax[0]
+        ##plt.xlim([ax[0]-.2*ax_s, ax[1]+.2*ax_s])
+        ##plt.ylim([-.3, .3])
+
+        fig = plt.gcf()
+        fig.tight_layout()  # otherwise the right y-label is slightly clipped
+        plt.grid(False)
+        plt.subplots_adjust(top=0.5)
+        fig.set_size_inches(args.isx,args.isy)
+        plt.savefig(f"{args.output_path}forceplot/forceplot_{row_index}_{best_action}.pdf",bbox_inches = 'tight')
+        plt.close()
+    pass
+
+#plot_multi_output(args.mult_out_num)
+#plot_summary_per_action() if args.summary_plot else None
+
+plot_force_plot_best_action(args.forceplot_num) 
