@@ -52,7 +52,7 @@ action_interval = parameters['action_interval']
 
 parameters['dataset_path'] = args.dataset
 #start wandb
-u.wand_init("TLC - Results",f"xqn: {ntpath.basename(args.parameters)[:-5]}", "xqn")
+u.wand_init("TLC - Results",f"xqn : {ntpath.basename(args.parameters)[:-5]}", "xqn")
 
 # create world
 world = World(args.config_file, thread_num=args.thread)
@@ -77,13 +77,13 @@ metric = [TravelTimeMetric(world), ThroughputMetric(world), SpeedScoreMetric(wor
 # create env
 env = TSCEnv(world, agents, metric)
 
-best_att = 1000
 
 # train dqn_agent
 def train(args, env):
     total_decision_num = 0
+    best_att = 1000
+
     for e in range(episodes):
-        
         last_obs = env.reset()
         if e % args.save_rate == args.save_rate - 1:
             env.eng.set_save_replay(True)
