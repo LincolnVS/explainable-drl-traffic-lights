@@ -77,6 +77,8 @@ metric = [TravelTimeMetric(world), ThroughputMetric(world), SpeedScoreMetric(wor
 # create env
 env = TSCEnv(world, agents, metric)
 
+best_att = 1000
+
 # train dqn_agent
 def train(args, env):
     total_decision_num = 0
@@ -150,6 +152,11 @@ def train(args, env):
         
         u.wand_log(eval_dict)
         
+        if e > 100 and best_att > eval_dict["Average Travel Time"]:
+            best_att = eval_dict["Average Travel Time"]
+            for agent in agents:
+                agent.save_model(args.save_dir,name=f"xqn_{agent.iid}_{e}_{best_att}.pickle")
+
     for agent in agents:
         agent.save_model(args.save_dir)
 

@@ -158,8 +158,8 @@ class XQNAgent(RLAgent):
         #self.model.load_weights(model_name)
         self.model = pickle.load(open(f"{model_name}", "rb"))
 
-    def save_model(self, dir="model/xqn"):
-        name = "xqn_agent_{}.pickle".format(self.iid)
+    def save_model(self,name=None, dir="model/xqn"):
+        name = "xqn_agent_{}.pickle".format(self.iid) if name == None else name
         model_name = os.path.join(dir, name)
         
         pickle.dump(self.model, file = open(f"{model_name}", "wb"))
