@@ -1,0 +1,11 @@
+{       
+	"interval": 1.0,
+	"seed": 1,
+	"dir": "/home/schreiber/mestrado/tlc-baselines/envs/jinan_3x4/jinan_maxpressure/",
+	"roadnetFile": "roadnet.json",
+	"flowFile": "flow.json",
+	"rlTrafficLight": true,
+	"saveReplay": true,
+	"roadnetLogFile": "roadnetlog.json",
+	"replayLogFile": "replay.txt"
+}
