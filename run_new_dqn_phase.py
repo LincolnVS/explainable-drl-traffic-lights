@@ -1,7 +1,7 @@
 import gym
 from environment import TSCEnv
 from world import World
-from generator import PhaseVehicleGenerator, StateOfThreeGenerator,PressureRewardGenerator
+from generator import PhaseVehicleGenerator, LaneVehicleGenerator,PressureRewardGenerator
 from agent import DQNAgent
 from metric import TravelTimeMetric, ThroughputMetric, SpeedScoreMetric,MaxWaitingTimeMetric
 import argparse
@@ -50,7 +50,7 @@ parameters['log_path'] = args.log_dir
 action_interval = parameters['action_interval']
 
 #start wandb
-u.wand_init("TLC - Results",f"new_dqn p: {ntpath.basename(args.parameters)[:-5]}", "new_dqn p")
+u.wand_init("TLC - Results",f"new_dqn d: {ntpath.basename(args.parameters)[:-5]}", "new_dqn d")
 
 # create world
 world = World(args.config_file, thread_num=args.thread)
@@ -62,7 +62,7 @@ for i in world.intersections:
     agents.append(DQNAgent(
         action_space,
         PhaseVehicleGenerator(world, i, ["phase_vehicles"], in_only=True, average=None, scale=0.0125),
-        PressureRewardGenerator(world, i, scale=.005, negative=True),
+        LaneVehicleGenerator(world, i, ["lane_waiting_count"], in_only=True, average="all", negative=True),
         i.id,
         parameters
     ))
@@ -105,7 +105,7 @@ def train(args, env):
                     obs, rewards, dones, _ = env.step(actions)
                     i += 1
                     rewards_list.append(rewards)
-                rewards = np.mean(rewards_list, axis=0)
+                rewards = np.mean(rewards_list, axis=0) *.01
 
                 for agent_id, agent in enumerate(agents):
                     u.append_new_line(file_name+f"_{agent_id}",[[last_obs[agent_id],-1], actions[agent_id], rewards[agent_id], [obs[agent_id],-1],e,i])

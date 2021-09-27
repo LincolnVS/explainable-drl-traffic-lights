@@ -58,9 +58,9 @@ def get_dataset(path):
     return X,y
 
 
-class XGBRegressor(XGBRegressor):
-    def partial_fit(self, X, y):
-        super().fit(X, y, xgb_model=super().get_booster())
+# class XGBRegressor(XGBRegressor):
+#     def partial_fit(self, X, y):
+#         super().fit(X, y, xgb_model=super().get_booster())
 
 def current_milli_time():
     return round(time.time() * 1000)
@@ -133,7 +133,7 @@ class XQNAgent(RLAgent):
             return
         
         minibatch = self.sampler_algorithm.get_sample(self.memory,len(self.memory))
-        print(len(minibatch))
+        #print(len(minibatch))
         _obs, actions, rewards, _next_obs = [np.stack(x) for x in np.array(minibatch).T]
         obs =  np.array(_obs)
         next_obs =  np.array(_next_obs)
@@ -150,22 +150,19 @@ class XQNAgent(RLAgent):
             target_f[i][action] = target[i]
         
         self.model.fit(obs, target_f)
-        
+        self.decay_epsilon()
 
-    def load_model(self, dir="model/dqn"):
+    def load_model(self, dir="model/xqn"):
         name = "xqn_agent_{}.pickle".format(self.iid)
         model_name = os.path.join(dir, name)
         #self.model.load_weights(model_name)
         self.model = pickle.load(open(f"{model_name}", "rb"))
 
-    def save_model(self, dir="model/dqn"):
+    def save_model(self, dir="model/xqn"):
         name = "xqn_agent_{}.pickle".format(self.iid)
         model_name = os.path.join(dir, name)
         
         pickle.dump(self.model, file = open(f"{model_name}", "wb"))
     
     def decay_epsilon(self):
-        if self.decay_type == "linear":
-            self.epsilon = np.max([self.epsilon-self.epsilon_decay,self.epsilon_min])
-        else:
-            self.epsilon = np.max([self.epsilon*self.epsilon_decay,self.epsilon_min])
+        self.epsilon = np.max([self.epsilon*self.epsilon_decay,self.epsilon_min])
