@@ -114,8 +114,8 @@ def train(args, env):
                     agent.remember(last_obs[agent_id], actions[agent_id], rewards[agent_id], obs[agent_id])
                     episodes_rewards[agent_id] += rewards[agent_id]
                     episodes_decision_num += 1
-                    total_decision_num += 1
                 
+                total_decision_num += 1
                 last_obs = obs
 
                 for agent_id, agent in enumerate(agents):
