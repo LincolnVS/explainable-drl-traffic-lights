@@ -52,7 +52,7 @@ action_interval = parameters['action_interval']
 
 parameters['dataset_path'] = args.dataset
 #start wandb
-u.wand_init("TLC - Results",f"xqn : {ntpath.basename(args.parameters)[:-5]}", "xqn")
+u.wand_init("TLC - Results C2",f"XQN : {ntpath.basename(args.parameters)[:-5]}", "XQN")
 
 # create world
 world = World(args.config_file, thread_num=args.thread)

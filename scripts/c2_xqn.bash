@@ -12,7 +12,7 @@ echo "...Starting all xqn..." | tee $file_name
 for i in $(seq $min_test $max_test)
 do
    echo "Running $i/$max_test, default.json"  | tee -a $file_name
-   python run_xqn.py $dataset_name | tee -a $file_name
+   python run_xqn2.py $dataset_name | tee -a $file_name
    printf "\n" | tee -a $file_name
 done   
 
