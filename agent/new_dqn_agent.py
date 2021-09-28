@@ -11,12 +11,15 @@ from agent.SamplerAlgorithms import ProportionalSampler2 as ProportionalSampler
 import pickle
 
 class DQNAgent(RLAgent):
-    def __init__(self, action_space, ob_generator, reward_generator, iid, parameters):
+    def __init__(self, action_space, ob_generator, reward_generator, iid, parameters,world):
         super().__init__(action_space, ob_generator, reward_generator)
 
         self.iid = iid
         self.parameters = parameters
         self.ob_length = ob_generator.ob_length
+        
+        self.world = world
+        self.world.subscribe("pressure")
 
 
         self.gamma = self.parameters["gamma"]  # discount rate
@@ -46,6 +49,10 @@ class DQNAgent(RLAgent):
         ob = self._reshape_ob(ob)
         act_values = self.model.predict(ob)
         return np.argmax(act_values[0])
+
+    def get_reward(self):
+        reward = self.world.get_info("pressure")[self.iid]*0.005
+        return -1*reward
 
     def sample(self):
         return self.action_space.sample()

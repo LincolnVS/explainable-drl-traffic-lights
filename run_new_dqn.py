@@ -62,9 +62,10 @@ for i in world.intersections:
     agents.append(DQNAgent(
         action_space,
         LaneVehicleGenerator(world, i, ["lane_count"], in_only=True, average=None, scale=.025),
-        PressureRewardGenerator(world, i, scale=.005, negative=True),
+        PressureRewardGenerator(world, i, scale=0.005, negative=True),
         i.id,
-        parameters
+        parameters,
+        world
     ))
     if args.load_model:
         agents[-1].load_model(args.save_dir)
