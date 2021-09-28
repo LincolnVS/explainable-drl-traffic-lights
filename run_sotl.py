@@ -64,5 +64,21 @@ while steps < args.steps:
 print(f"\n--SOTL Results--")
 print(f"Steps: {steps}")
 print(f"Episodes Rewards: {episodes_rewards/steps:.4f}")
+# for metric in env.metric:
+#     print(f"{metric.name}: {metric.eval():.4f}")
+
+#start wandb
+u.wand_init("TLC - Results C2",f"SOTL: {options['green_time']} {options['green_v']} {options['red_v']}", "SOTL")
+
+eval_dict = {}
+eval_dict["epsilon"]=0
+eval_dict["steps"]=steps
+eval_dict["mean_episode_reward"]=episodes_rewards/steps
 for metric in env.metric:
+    eval_dict[metric.name]=metric.eval()
     print(f"{metric.name}: {metric.eval():.4f}")
+
+for e in range(200):
+    eval_dict["episode"]=e
+
+    u.wand_log(eval_dict)

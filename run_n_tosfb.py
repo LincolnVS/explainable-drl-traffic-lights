@@ -58,7 +58,7 @@ for i in world.intersections:
         agents[-1].load_model(args.save_dir)
 
 
-wandb.init(project='TLC - Results', 
+wandb.init(project='TLC - Results C2', 
             name='tosfb', 
             save_code=True,
             config={'lr': agents[-1].alpha,
@@ -67,7 +67,8 @@ wandb.init(project='TLC - Results',
                     'min_epsilon': agents[-1].min_epsilon,
                     'lambda': agents[-1].lamb,
                     'max_nonzero_fourier': agents[-1].max_non_zero_fourier,
-                    'epsilon_decay': agents[-1].epsilon_decay})
+                    'epsilon_decay': agents[-1].epsilon_decay},
+            group='tosfb')
 
 # Create metric
 metric = [TravelTimeMetric(world), ThroughputMetric(world), SpeedScoreMetric(world), MaxWaitingTimeMetric(world)]
@@ -158,11 +159,11 @@ def train(args, env):
             print(f"\tmean reward: {mean_reward[agent_id]}")
             print(f"\tmean td error: {mean_td_error[agent_id]}")
 
-            eval_dict["epsilon"]=agent.epsilon
-            eval_dict["mean_episode_reward"]=mean_reward[agent_id]
-            eval_dict['mean_td_error']= mean_td_error[agent_id]
+        eval_dict["epsilon"]=agent.epsilon
+        eval_dict["mean_episode_reward"]=np.mean(list(mean_reward.values()))
+        eval_dict['mean_td_error']= np.mean(list(mean_td_error.values()))
 
-            wandb.log(eval_dict)
+        wandb.log(eval_dict)
 
     wandb.run.finish()
 
