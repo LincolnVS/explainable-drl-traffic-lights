@@ -111,10 +111,10 @@ def train(args, env):
                 for agent_id, agent in enumerate(agents):
                     u.append_new_line(file_name+f"_{agent_id}",[[last_obs[agent_id],-1], actions[agent_id], rewards[agent_id], [obs[agent_id],-1],e,i])
                     agent.remember(last_obs[agent_id], actions[agent_id], rewards[agent_id], obs[agent_id])
-                    episodes_rewards[agent_id] += rewards[agent_id]
+                    episodes_rewards[agent_id] += rewards[agent_id]                
                     episodes_decision_num += 1
-                    total_decision_num += 1
-                
+                    
+                total_decision_num += 1
                 last_obs = obs
 
                 for agent_id, agent in enumerate(agents):
