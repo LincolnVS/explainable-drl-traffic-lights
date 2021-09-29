@@ -99,7 +99,7 @@ def train(args, env):
             if i % action_interval == 0:
                 actions = []
                 for agent_id, agent in enumerate(agents):
-                    actions.append(agent.get_action(last_obs[agent_id]))
+                    actions.append(agents[0].get_action(last_obs[agent_id]))
         
                 #print(actions)
                 rewards_list = []
@@ -111,27 +111,27 @@ def train(args, env):
 
                 for agent_id, agent in enumerate(agents):
                     #u.append_new_line(file_name+f"_{agent_id}",[[last_obs[agent_id],-1], actions[agent_id], rewards[agent_id], [obs[agent_id],-1],e,i])
-                    agent.remember(last_obs[agent_id], actions[agent_id], rewards[agent_id], obs[agent_id])
+                    agents[0].remember(last_obs[agent_id], actions[agent_id], rewards[agent_id], obs[agent_id])
                     episodes_rewards[agent_id] += rewards[agent_id]
                     episodes_decision_num += 1
                 
                 total_decision_num += 1
                 last_obs = obs
 
-                for agent_id, agent in enumerate(agents):
-                    if total_decision_num > agent.learning_start and total_decision_num % agent.update_model_freq == agent.update_model_freq - 1:
-                        agent.replay()
-                    if total_decision_num > agent.learning_start and total_decision_num % agent.update_target_model_freq == agent.update_target_model_freq - 1:
-                        agent.update_target_network()
-                        
+                #for agent_id, agent in enumerate(agents):
+                if total_decision_num > agents[0].learning_start and total_decision_num % agents[0].update_model_freq == agents[0].update_model_freq - 1:
+                    agents[0].replay()
+                if total_decision_num > agents[0].learning_start and total_decision_num % agents[0].update_target_model_freq == agents[0].update_target_model_freq - 1:
+                    agents[0].update_target_network()
+                    
             if all(dones):
                 break
 
         if e % args.save_rate == args.save_rate - 1:
             if not os.path.exists(args.save_dir):
                 os.makedirs(args.save_dir)
-            for agent in agents:
-                agent.save_model(args.save_dir)
+            #for agent in agents:
+            agents[0].save_model(args.save_dir)
 
         eval_dict = {}
 
@@ -154,11 +154,10 @@ def train(args, env):
         
         if e > 100 and best_att > eval_dict["Average Travel Time"]:
             best_att = eval_dict["Average Travel Time"]
-            for agent in agents:
-                agent.save_model(args.save_dir,name=f"xqn_{agent.iid}_{e}_{best_att}.pickle")
+            agents[0].save_model(args.save_dir,name=f"xqn_{agent.iid}_{e}_{best_att}.pickle")
 
-    for agent in agents:
-        agent.save_model(args.save_dir)
+    #for agent in agents:
+    agents[0].save_model(args.save_dir)
 
 def test():
     obs = env.reset()
