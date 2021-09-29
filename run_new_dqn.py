@@ -113,7 +113,7 @@ def train(args, env):
                 rewards = np.mean(rewards_list, axis=0)
 
                 for agent_id, agent in enumerate(agents):
-                    u.append_new_line(file_name+f"_{agent_id}",[[last_obs[agent_id],-1], actions[agent_id], rewards[agent_id], [obs[agent_id],-1],e,i])
+                    #u.append_new_line(file_name+f"_{agent_id}",[[last_obs[agent_id],-1], actions[agent_id], rewards[agent_id], [obs[agent_id],-1],e,i])
                     agents[0].remember(last_obs[agent_id], actions[agent_id], rewards[agent_id], obs[agent_id])
                     episodes_rewards[agent_id] += rewards[agent_id]                
                     episodes_decision_num += 1
@@ -124,7 +124,6 @@ def train(args, env):
                 #for agent_id, agent in enumerate(agents):
                 if total_decision_num > agents[0].learning_start and total_decision_num % agents[0].update_model_freq == agents[0].update_model_freq - 1:
                     agents[0].replay()
-                    break
                 if total_decision_num > agents[0].learning_start and total_decision_num % agents[0].update_target_model_freq == agents[0].update_target_model_freq - 1:
                     agents[0].update_target_network()
                     
