@@ -15,7 +15,7 @@ import ntpath
 # parse args
 parser = argparse.ArgumentParser(description='Run Example')
 parser.add_argument('config_file', type=str, help='path of config file')
-parser.add_argument('--thread', type=int, default=1, help='number of threads')
+parser.add_argument('--thread', type=int, default=8, help='number of threads')
 parser.add_argument('--steps', type=int, default=3600, help='number of steps')
 #parser.add_argument('--action_interval', type=int, default=20, help='how often agent make decisions')
 #parser.add_argument('--episodes', type=int, default=200, help='training episodes')
@@ -24,7 +24,7 @@ parser.add_argument('--load_model', action="store_true", default=False)
 parser.add_argument("--save_rate", type=int, default=20, help="save model once every time this many episodes are completed")
 parser.add_argument('--save_dir', type=str, default="model/dqn", help='directory in which model should be saved')
 parser.add_argument('--log_dir', type=str, default="log/dqn", help='directory in which logs should be saved')
-parser.add_argument('--parameters', type=str, default="agent/configs_new_dqn/default.json", help='path to the file with informations about the model')
+parser.add_argument('--parameters', type=str, default="agent/configs_new_dqn4/8.json", help='path to the file with informations about the model')
 
 args = parser.parse_args()
 
@@ -57,6 +57,10 @@ world = World(args.config_file, thread_num=args.thread)
 
 # create agents
 agents = []
+
+#parameters['buffer_size'] = parameters['buffer_size']*len(world.intersections)
+#parameters['batch_size'] = parameters['batch_size']*len(world.intersections)
+
 for i in world.intersections:
     action_space = gym.spaces.Discrete(len(i.phases))
     agents.append(DQNAgent(
@@ -97,9 +101,9 @@ def train(args, env):
                 actions = []
                 for agent_id, agent in enumerate(agents):
                     if total_decision_num > agent.learning_start:
-                        actions.append(agent.get_action(last_obs[agent_id]))
+                        actions.append(agents[0].get_action(last_obs[agent_id]))
                     else:
-                        actions.append(agent.sample())
+                        actions.append(agents[0].sample())
 
                 rewards_list = []
                 for _ in range(action_interval):
@@ -110,18 +114,20 @@ def train(args, env):
 
                 for agent_id, agent in enumerate(agents):
                     u.append_new_line(file_name+f"_{agent_id}",[[last_obs[agent_id],-1], actions[agent_id], rewards[agent_id], [obs[agent_id],-1],e,i])
-                    agent.remember(last_obs[agent_id], actions[agent_id], rewards[agent_id], obs[agent_id])
+                    agents[0].remember(last_obs[agent_id], actions[agent_id], rewards[agent_id], obs[agent_id])
                     episodes_rewards[agent_id] += rewards[agent_id]                
                     episodes_decision_num += 1
                     
                 total_decision_num += 1
                 last_obs = obs
 
-                for agent_id, agent in enumerate(agents):
-                    if total_decision_num > agent.learning_start and total_decision_num % agent.update_model_freq == agent.update_model_freq - 1:
-                        agent.replay()
-                    if total_decision_num > agent.learning_start and total_decision_num % agent.update_target_model_freq == agent.update_target_model_freq - 1:
-                        agent.update_target_network()
+                #for agent_id, agent in enumerate(agents):
+                if total_decision_num > agents[0].learning_start and total_decision_num % agents[0].update_model_freq == agents[0].update_model_freq - 1:
+                    agents[0].replay()
+                    break
+                if total_decision_num > agents[0].learning_start and total_decision_num % agents[0].update_target_model_freq == agents[0].update_target_model_freq - 1:
+                    agents[0].update_target_network()
+                    
                         
             if all(dones):
                 break
@@ -129,8 +135,9 @@ def train(args, env):
         if e % args.save_rate == args.save_rate - 1:
             if not os.path.exists(args.save_dir):
                 os.makedirs(args.save_dir)
-            for agent in agents:
-                agent.save_model(args.save_dir)
+            #for agent in agents:
+            agents[0].save_model(args.save_dir)
+            #    break
 
         eval_dict = {}
 
@@ -144,32 +151,15 @@ def train(args, env):
         for metric in env.metric:
             logger.info(f"\t{metric.name}: {metric.eval()}")
             eval_dict[metric.name]=metric.eval()
-
    
         eval_dict["epsilon"]=agents[0].epsilon
         eval_dict["mean_episode_reward"]=episodes_rewards[0] / episodes_decision_num
         
         u.wand_log(eval_dict)
-        
-    for agent in agents:
-        agent.save_model(args.save_dir)
-
-def test():
-    obs = env.reset()
-    for agent in agents:
-        agent.load_model(args.save_dir)
-    for i in range(args.steps):
-        if i % args.action_interval == 0:
-            actions = []
-            for agent_id, agent in enumerate(agents):
-                actions.append(agent.get_action(obs[agent_id]))
-        obs, rewards, dones, info = env.step(actions)
-        #print(rewards)
-
-        if all(dones):
-            break
-    logger.info("Final Travel Time is %.4f" % env.metric.update(done=True))
-
+    
+    #for agent in agents:
+    agents[0].save_model(args.save_dir)
+    #    break
 
 if __name__ == '__main__':
     # simulate

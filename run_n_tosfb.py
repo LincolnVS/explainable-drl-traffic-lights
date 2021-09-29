@@ -108,9 +108,9 @@ def train(args, env):
                 actions = []
                 for agent_id, agent in enumerate(agents):
                     if total_decision_num > agent.learning_start:
-                        actions.append(agent.get_action(last_obs[agent_id]))
+                        actions.append(agents[0].get_action(last_obs[agent_id]))
                     else:
-                        actions.append(agent.sample())
+                        actions.append(agents[0].sample())
 
                 rewards_list = []
                 for _ in range(args.action_interval):
@@ -124,7 +124,7 @@ def train(args, env):
                 rewards = np.mean(rewards_list, axis=0)
 
                 for agent_id, agent in enumerate(agents):
-                    agent.remember(last_obs[agent_id], actions[agent_id], rewards[agent_id], obs[agent_id])
+                    agents[0].remember(last_obs[agent_id], actions[agent_id], rewards[agent_id], obs[agent_id])
                     episodes_rewards[agent_id] += rewards[agent_id]
                     episodes_decision_num += 1
                     total_decision_num += 1
@@ -138,8 +138,8 @@ def train(args, env):
         if e % args.save_rate == args.save_rate - 1:
             if not os.path.exists(args.save_dir):
                 os.makedirs(args.save_dir)
-            for agent in agents:
-                agent.save_model(args.save_dir)
+            #for agent in agents:
+            agents[0].save_model(args.save_dir)
 
 
         print(f"episode:{e}/{args.episodes}, epi total decisions: {episodes_decision_num}")
@@ -166,23 +166,6 @@ def train(args, env):
         wandb.log(eval_dict)
 
     wandb.run.finish()
-
-def test():
-    obs = env.reset()
-    for agent in agents:
-        agent.load_model(args.save_dir)
-    for i in range(args.steps):
-        if i % args.action_interval == 0:
-            actions = []
-            for agent_id, agent in enumerate(agents):
-                actions.append(agent.get_action(obs[agent_id]))
-        obs, rewards, dones, info = env.step(actions)
-        #print(rewards)
-
-        if all(dones):
-            break
-    logger.info("Final Travel Time is %.4f" % env.metric.update(done=True))
-
 
 if __name__ == '__main__':
     # simulate
