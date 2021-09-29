@@ -129,8 +129,8 @@ def train(args, env):
                     agents[0].update_target_network()
                     
                         
-            if all(dones):
-                break
+            #if all(dones):
+            #    break
 
         if e % args.save_rate == args.save_rate - 1:
             if not os.path.exists(args.save_dir):
