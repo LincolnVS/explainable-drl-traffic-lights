@@ -45,14 +45,15 @@ class DQNAgent(RLAgent):
 
     def get_action(self, ob):
         if np.random.rand() <= self.epsilon:
-            return self.action_space.sample()
+
+            return np.argmax(ob)
         ob = self._reshape_ob(ob)
         act_values = self.model.predict(ob)
         return np.argmax(act_values[0])
 
-    def get_reward(self):
-        reward = self.world.get_info("pressure")[self.iid]*0.005
-        return -1*reward
+    #def get_reward(self):
+    #    reward = self.world.get_info("pressure")[self.iid]*0.005
+    #    return -1*reward
 
     def sample(self):
         return self.action_space.sample()
@@ -81,6 +82,7 @@ class DQNAgent(RLAgent):
         self.target_model.set_weights(weights)
 
     def remember(self, ob, action, reward, next_ob):
+        
         self.memory.append((ob, action, reward, next_ob))
 
     def replay(self):

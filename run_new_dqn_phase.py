@@ -2,7 +2,7 @@ import gym
 from environment import TSCEnv
 from world import World
 from generator import PhaseVehicleGenerator, LaneVehicleGenerator,PressureRewardGenerator
-from agent import DQNAgent
+from agent.new_dqn_agent import DQNAgent
 from metric import TravelTimeMetric, ThroughputMetric, SpeedScoreMetric,MaxWaitingTimeMetric
 import argparse
 import os
@@ -50,7 +50,7 @@ parameters['log_path'] = args.log_dir
 action_interval = parameters['action_interval']
 
 #start wandb
-u.wand_init("TLC - Results",f"new_dqn d: {ntpath.basename(args.parameters)[:-5]}", "new_dqn d")
+u.wand_init("TLC - Results C2",f"new_dqn d: {ntpath.basename(args.parameters)[:-5]}", "new_dqn d")
 
 # create world
 world = World(args.config_file, thread_num=args.thread)
@@ -62,12 +62,14 @@ for i in world.intersections:
     agents.append(DQNAgent(
         action_space,
         PhaseVehicleGenerator(world, i, ["phase_vehicles"], in_only=True, average=None, scale=0.0125),
-        LaneVehicleGenerator(world, i, ["lane_waiting_count"], in_only=True, average="all", negative=True),
+        PressureRewardGenerator(world, i, scale=.005, negative=True),
         i.id,
-        parameters
+        parameters,
+        world
     ))
     if args.load_model:
         agents[-1].load_model(args.save_dir)
+main_agent = agents[0]
 
 # Create metric
 metric = [TravelTimeMetric(world), ThroughputMetric(world), SpeedScoreMetric(world), MaxWaitingTimeMetric(world)]
@@ -96,31 +98,34 @@ def train(args, env):
                 actions = []
                 for agent_id, agent in enumerate(agents):
                     if total_decision_num > agent.learning_start:
-                        actions.append(agent.get_action(last_obs[agent_id]))
+                        actions.append(main_agent.get_action(last_obs[agent_id]))
                     else:
-                        actions.append(agent.sample())
+                        actions.append(main_agent.sample())
 
                 rewards_list = []
                 for _ in range(action_interval):
                     obs, rewards, dones, _ = env.step(actions)
                     i += 1
                     rewards_list.append(rewards)
-                rewards = np.mean(rewards_list, axis=0) *.01
+
+                rewards = np.mean(rewards_list, axis=0)
+                
+
 
                 for agent_id, agent in enumerate(agents):
                     u.append_new_line(file_name+f"_{agent_id}",[[last_obs[agent_id],-1], actions[agent_id], rewards[agent_id], [obs[agent_id],-1],e,i])
-                    agent.remember(last_obs[agent_id], actions[agent_id], rewards[agent_id], obs[agent_id])
+                    main_agent.remember(last_obs[agent_id], actions[agent_id], rewards[agent_id], obs[agent_id])
                     episodes_rewards[agent_id] += rewards[agent_id]
                     episodes_decision_num += 1
-                    total_decision_num += 1
-                
+                    
+                total_decision_num += 1
                 last_obs = obs
 
-                for agent_id, agent in enumerate(agents):
-                    if total_decision_num > agent.learning_start and total_decision_num % agent.update_model_freq == agent.update_model_freq - 1:
-                        agent.replay()
-                    if total_decision_num > agent.learning_start and total_decision_num % agent.update_target_model_freq == agent.update_target_model_freq - 1:
-                        agent.update_target_network()
+                #for agent_id, agent in enumerate(agents):
+                if total_decision_num > main_agent.learning_start and total_decision_num % main_agent.update_model_freq == main_agent.update_model_freq - 1:
+                    main_agent.replay()
+                if total_decision_num > main_agent.learning_start and total_decision_num % main_agent.update_target_model_freq == main_agent.update_target_model_freq - 1:
+                    main_agent.update_target_network()
                         
             if all(dones):
                 break
@@ -128,8 +133,8 @@ def train(args, env):
         if e % args.save_rate == args.save_rate - 1:
             if not os.path.exists(args.save_dir):
                 os.makedirs(args.save_dir)
-            for agent in agents:
-                agent.save_model(args.save_dir)
+            
+            main_agent.save_model(args.save_dir)
 
         eval_dict = {}
 
@@ -145,34 +150,13 @@ def train(args, env):
             eval_dict[metric.name]=metric.eval()
 
    
-        eval_dict["epsilon"]=agents[0].epsilon
+        eval_dict["epsilon"]=main_agent.epsilon
         eval_dict["mean_episode_reward"]=episodes_rewards[0] / episodes_decision_num
         
         u.wand_log(eval_dict)
         
-    for agent in agents:
-        agent.save_model(args.save_dir)
-
-def test():
-    obs = env.reset()
-    for agent in agents:
-        agent.load_model(args.save_dir)
-    for i in range(args.steps):
-        if i % args.action_interval == 0:
-            actions = []
-            for agent_id, agent in enumerate(agents):
-                actions.append(agent.get_action(obs[agent_id]))
-        obs, rewards, dones, info = env.step(actions)
-        #print(rewards)
-
-        if all(dones):
-            break
-    logger.info("Final Travel Time is %.4f" % env.metric.update(done=True))
-
+    #for agent in agents:
+    main_agent.save_model(args.save_dir)
 
 if __name__ == '__main__':
-    # simulate
-    # import os
-    # os.environ["CUDA_VISIBLE_DEVICES"] = '0, 1'
     train(args, env)
-    #test()
