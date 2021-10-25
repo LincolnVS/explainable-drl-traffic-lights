@@ -220,6 +220,8 @@ class World(object):
                         road["startIntersection"] == i.id)
                 for n in range(len(road["lanes"]))[::(1 if from_zero else -1)]:
                     out_lanes.append(road["id"] + "_" + str(n))
+            
+            
             for lane in vehicles.keys():
                 if lane in in_lanes:
                     pressure += vehicles[lane]
@@ -313,7 +315,7 @@ class World(object):
             vehicles = self.eng.get_lane_waiting_vehicle_count()
             v = []
 
-            for idx in range(8):
+            for idx in range(len(i.phase_available_startlanes)):
                 v.append(np.sum([vehicles[key] for key in vehicles if key in i.phase_available_startlanes[idx]]))
 
             phase_vehicles[i.id] = v
@@ -432,6 +434,13 @@ class World(object):
 
 
 if __name__ == "__main__":
-    world = World("examples/config.json", thread_num=1)
+    world = World("envs/jinan_3x4/config.json", thread_num=1)
     # print(len(world.intersections[0].startlanes))
-    print(world.intersections[0].phase_available_startlanes)
+    for n in range(200):
+        world.step()
+ 
+    print(world.intersections[0].phase_available_startlanes)           
+
+    print(world.get_phase_vehicles()['intersection_1_1'])
+
+    print(world.get_pressure()['intersection_1_1'])

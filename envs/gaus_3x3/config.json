@@ -1,7 +1,7 @@
 {       
 	"interval": 1.0,
 	"seed": 1,
-	"dir": "/mnt/d/trabalhoso/tlc-baselines/datasets/gaus_3x3/roadnet_3x3/",
+	"dir": "/mnt/d/trabalhoso/tlc-baselines/envs/gaus_3x3/roadnet_3x3/",
 	"roadnetFile": "roadnet.json",
 	"flowFile": "flow.json",
 	"rlTrafficLight": true,
