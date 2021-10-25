@@ -1,7 +1,7 @@
 import gym
 from environment import TSCEnv
 from world import World
-from generator import LaneVehicleGenerator, StateOfThreeGenerator,PressureRewardGenerator
+from generator import PhaseVehicleGenerator, LaneVehicleGenerator,PressureRewardGenerator
 from agent import DQNAgent
 from agent.xqn_agent import XQNAgent
 from metric import TravelTimeMetric, ThroughputMetric, SpeedScoreMetric,MaxWaitingTimeMetric
@@ -63,13 +63,14 @@ for i in world.intersections:
     action_space = gym.spaces.Discrete(len(i.phases))
     agents.append(XQNAgent(
         action_space,
-        LaneVehicleGenerator(world, i, ["lane_count"], in_only=True, average=None, scale=.025),
+        PhaseVehicleGenerator(world, i, ["phase_vehicles"], in_only=True, average=None, scale=0.0125),
         PressureRewardGenerator(world, i, scale=.005, negative=True),
         i.id,
         parameters
     ))
     if args.load_model:
         agents[-1].load_model(args.save_dir)
+main_agent = agents[0]
 
 # Create metric
 metric = [TravelTimeMetric(world), ThroughputMetric(world), SpeedScoreMetric(world), MaxWaitingTimeMetric(world)]
@@ -99,7 +100,7 @@ def train(args, env):
             if i % action_interval == 0:
                 actions = []
                 for agent_id, agent in enumerate(agents):
-                    actions.append(agents[0].get_action(last_obs[agent_id]))
+                    actions.append(main_agent.get_action(last_obs[agent_id]))
         
                 #print(actions)
                 rewards_list = []
@@ -111,18 +112,18 @@ def train(args, env):
 
                 for agent_id, agent in enumerate(agents):
                     #u.append_new_line(file_name+f"_{agent_id}",[[last_obs[agent_id],-1], actions[agent_id], rewards[agent_id], [obs[agent_id],-1],e,i])
-                    agents[0].remember(last_obs[agent_id], actions[agent_id], rewards[agent_id], obs[agent_id])
+                    main_agent.remember(last_obs[agent_id], actions[agent_id], rewards[agent_id], obs[agent_id])
                     episodes_rewards[agent_id] += rewards[agent_id]
                     episodes_decision_num += 1
-                
+                    
                 total_decision_num += 1
                 last_obs = obs
 
                 #for agent_id, agent in enumerate(agents):
-                if total_decision_num > agents[0].learning_start and total_decision_num % agents[0].update_model_freq == agents[0].update_model_freq - 1:
-                    agents[0].replay()
-                if total_decision_num > agents[0].learning_start and total_decision_num % agents[0].update_target_model_freq == agents[0].update_target_model_freq - 1:
-                    agents[0].update_target_network()
+                if total_decision_num > main_agent.learning_start and total_decision_num % main_agent.update_model_freq == main_agent.update_model_freq - 1:
+                    main_agent.replay()
+                if total_decision_num > main_agent.learning_start and total_decision_num % main_agent.update_target_model_freq == main_agent.update_target_model_freq - 1:
+                    main_agent.update_target_network()
                     
             if all(dones):
                 break
@@ -130,8 +131,8 @@ def train(args, env):
         if e % args.save_rate == args.save_rate - 1:
             if not os.path.exists(args.save_dir):
                 os.makedirs(args.save_dir)
-            #for agent in agents:
-            agents[0].save_model(args.save_dir)
+
+            main_agent.save_model(args.save_dir)
 
         eval_dict = {}
 
@@ -147,17 +148,17 @@ def train(args, env):
             eval_dict[metric.name]=metric.eval()
 
    
-        eval_dict["epsilon"]=agents[0].epsilon
+        eval_dict["epsilon"]=main_agent.epsilon
         eval_dict["mean_episode_reward"]=episodes_rewards[0] / episodes_decision_num
         
         u.wand_log(eval_dict)
         
         if e > 100 and best_att > eval_dict["Average Travel Time"]:
             best_att = eval_dict["Average Travel Time"]
-            agents[0].save_model(args.save_dir,name=f"xqn_{agent.iid}_{e}_{best_att}.pickle")
+            main_agent.save_model(args.save_dir,name=f"xqn_{agent.iid}_{e}_{best_att}.pickle")
 
     #for agent in agents:
-    agents[0].save_model(args.save_dir)
+    main_agent.save_model(args.save_dir)
 
 def test():
     obs = env.reset()
