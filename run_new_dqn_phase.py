@@ -50,7 +50,7 @@ parameters['log_path'] = args.log_dir
 action_interval = parameters['action_interval']
 
 #start wandb
-u.wand_init("TLC - Results C2",f"new_dqn d: {ntpath.basename(args.parameters)[:-5]}", "new_dqn d")
+u.wand_init("TLC - Results C2",f"new_dqn ts: {ntpath.basename(args.parameters)[:-5]}", "new_dqn ts")
 
 # create world
 world = World(args.config_file, thread_num=args.thread)
