@@ -2,7 +2,7 @@
 
 file_name="log/dqn_jinan_3x4_all.log"
 
-info_file="agent/configs_new_dqn4/"
+info_file="agent/configs_new_dqn2/"
 dataset_name="envs/jinan_3x4/config_dqn.json"
 
 min_test=0
