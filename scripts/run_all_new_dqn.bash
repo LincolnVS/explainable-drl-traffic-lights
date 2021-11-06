@@ -2,11 +2,11 @@
 
 file_name="log/dqn_jinan_3x4_all.log"
 
-info_file="agent/configs_new_dqn2/"
+info_file="agent/configs_new_dqn5/"
 dataset_name="envs/jinan_3x4/config_dqn.json"
 
 min_test=0
-max_test=16
+max_test=14
 
 echo "...Starting all new_dqn..." | tee $file_name
 for i in $(seq $min_test $max_test)
