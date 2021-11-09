@@ -5,3 +5,4 @@ from .sotl_agent import SOTLAgent
 from .fixedtime_agent import Fixedtime_Agent
 from .frap_dqn_agent import FRAP_DQNAgent
 from .new_dqn_agent import DQNAgent
+from .max_vehicle_agent import MaxVehicleAgent

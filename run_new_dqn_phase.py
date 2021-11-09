@@ -109,8 +109,6 @@ def train(args, env):
                     rewards_list.append(rewards)
 
                 rewards = np.mean(rewards_list, axis=0)
-                
-
 
                 for agent_id, agent in enumerate(agents):
                     u.append_new_line(file_name+f"_{agent_id}",[[last_obs[agent_id],-1], actions[agent_id], rewards[agent_id], [obs[agent_id],-1],e,i])
@@ -149,7 +147,6 @@ def train(args, env):
             logger.info(f"\t{metric.name}: {metric.eval()}")
             eval_dict[metric.name]=metric.eval()
 
-   
         eval_dict["epsilon"]=main_agent.epsilon
         eval_dict["mean_episode_reward"]=episodes_rewards[0] / episodes_decision_num
         

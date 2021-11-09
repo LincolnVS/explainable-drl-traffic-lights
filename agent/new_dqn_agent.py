@@ -45,8 +45,7 @@ class DQNAgent(RLAgent):
 
     def get_action(self, ob):
         if np.random.rand() <= self.epsilon:
-
-            return np.argmax(ob)
+            self.sample(ob)
         ob = self._reshape_ob(ob)
         act_values = self.model.predict(ob)
         return np.argmax(act_values[0])
@@ -55,8 +54,10 @@ class DQNAgent(RLAgent):
     #    reward = self.world.get_info("pressure")[self.iid]*0.005
     #    return -1*reward
 
-    def sample(self):
-        return self.action_space.sample()
+    def sample(self, ob = None):
+        if ob is None:
+            return self.action_space.sample()
+        return np.argmax(ob)
 
     def _build_model(self):
         # Neural Net for Deep-Q learning Model
