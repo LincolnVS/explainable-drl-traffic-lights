@@ -9,6 +9,7 @@ Baselines include traditional TLC algorithms and reinforcement learning based me
 ## Publications
 
 1. Schreiber, L. V., Ramos, G. de O. & Bazzan, A. L. C. (2021). Towards Explainable Deep Reinforcement Learning for Traffic Signal Control [Oral Presentation]. International Conference on Machine Learning Conference: LatinX in AI (LXAI) Research Workshop 2021, Virtual. [LINK](https://research.latinxinai.org/papers/icml/2021/pdf/paper_26.pdf) 
+2 - Alegre, L. N., Ziemke, T. & Bazzan, A. L. C. (2021). Using reinforcement learning to control traffic signals in a real-world scenario: an approach based on linear function approximation. IEEE Transactions on Intelligent Transportation Systems. [LINK](https://ieeexplore.ieee.org/document/9468362)
 
 
 ## Install
@@ -53,7 +54,18 @@ For citing this work, please use the following entries.
   year = {2021},
   month = {July},
   publisher = {LatinX in AI},
-	url = {https://research.latinxinai.org/papers/icml/2021/pdf/paper_26.pdf}
+  url = {https://research.latinxinai.org/papers/icml/2021/pdf/paper_26.pdf}
+}
+```
+
+```bibtex
+@Article{Alegre+2021its, 
+	author = {Lucas N. Alegre and Theresa Ziemke and Ana L. C. Bazzan},
+	title = {Using reinforcement learning to control traffic signals in a real-world scenario: an approach based on linear function approximation},
+	journal = {IEEE Transactions on Intelligent Transportation Systems},
+	pages = {},
+	doi = {10.1109/TITS.2021.3091014},
+	year = {2021}
 }
 ```
 
