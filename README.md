@@ -6,6 +6,10 @@ Environments include single intersetion (single-agent) and multi intersections (
 
 Baselines include traditional TLC algorithms and reinforcement learning based methods.
 
+## Publications
+
+1. Schreiber, L. V., Ramos, G. de O. & Bazzan, A. L. C. (2021). Towards Explainable Deep Reinforcement Learning for Traffic Signal Control [Oral Presentation]. International Conference on Machine Learning Conference: LatinX in AI (LXAI) Research Workshop 2021, Virtual. [LINK](https://research.latinxinai.org/papers/icml/2021/pdf/paper_26.pdf) 
+
 
 ## Install
 
@@ -37,3 +41,21 @@ $conda env create -f conda_environment.yaml
 $conda list --export > requirements.txt
 ```
 -->
+## How to cite this research
+
+For citing this work, please use the following entries.
+
+```bibtex
+@InProceedings{Schreiber+2021lxai,
+  author = {Lincoln Schreiber and Gabriel {\relax de} O. Ramos and Ana L. C. Bazzan},
+  title = {Towards Explainable Deep Reinforcement Learning for Traffic Signal Control},
+  booktitle = {Proc. of LatinX in AI Workshop @ ICML 2021},
+  year = {2021},
+  month = {July},
+  publisher = {LatinX in AI},
+	url = {https://research.latinxinai.org/papers/icml/2021/pdf/paper_26.pdf}
+}
+```
+
+# License
+This project uses the following license: [MIT](https://github.com/LincolnVS/tlc-baselines/blob/master/LICENSE).
