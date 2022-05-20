@@ -48,13 +48,13 @@ For citing this work, please use the following entries.
 
 ```bibtex
 @InProceedings{Schreiber+2021lxai,
-  author = {Lincoln Schreiber and Gabriel {\relax de} O. Ramos and Ana L. C. Bazzan},
-  title = {Towards Explainable Deep Reinforcement Learning for Traffic Signal Control},
-  booktitle = {Proc. of LatinX in AI Workshop @ ICML 2021},
-  year = {2021},
-  month = {July},
-  publisher = {LatinX in AI},
-  url = {https://research.latinxinai.org/papers/icml/2021/pdf/paper_26.pdf}
+	author = {Lincoln Schreiber and Gabriel {\relax de} O. Ramos and Ana L. C. Bazzan},
+	title = {Towards Explainable Deep Reinforcement Learning for Traffic Signal Control},
+	booktitle = {Proc. of LatinX in AI Workshop @ ICML 2021},
+	year = {2021},
+	month = {July},
+	publisher = {LatinX in AI},
+	url = {https://research.latinxinai.org/papers/icml/2021/pdf/paper_26.pdf}
 }
 ```
 
