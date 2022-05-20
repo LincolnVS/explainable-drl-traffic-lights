@@ -7,9 +7,24 @@ Environments include single intersetion (single-agent) and multi intersections (
 Baselines include traditional TLC algorithms and reinforcement learning based methods.
 
 
-### Install
+## Install
 
-#### Requirements
+### Requirements
+
+Before you begin, ensure you have met the following requirements:
+- numpy v1.20.2
+- keras v2.3.1
+- python v3.7.10
+- tensorflow v1.14.0
+- pandas v1.2.3
+- scipy v1.6.2
+- seaborn v0.11.1
+- [CityFlow](https://github.com/cityflow-project/CityFlow)
+
+Newer versions of the above items may not be fully compatible with our code.
+
+### Conda Env
+To make reproducibility easier, using a conda environment it is possible to load all dependencies.
 
 **To create an environment from an environment file:**
 ```terminal
